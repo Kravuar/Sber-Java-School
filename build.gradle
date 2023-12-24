@@ -5,14 +5,14 @@ subprojects {
     repositories {
         mavenCentral()
     }
-    
-    tasks.withType(JavaCompile).tap {
-        configureEach {
-            sourceCompatibility = JavaVersion.VERSION_21
-            targetCompatibility = JavaVersion.VERSION_21
-        }
+
+    jar {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
-group = 'net.kravuar'
-version = '1.0'
+allprojects {
+    group = 'net.kravuar'
+    version = '1.0'
+}
