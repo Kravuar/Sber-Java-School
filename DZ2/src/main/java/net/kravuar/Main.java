@@ -39,6 +39,8 @@ public class Main {
         phoneBook.add("Бабаба", "5");
         phoneBook.add("Бибиби", "6");
         phoneBook.add("Бебебе", "7");
+        phoneBook.add("Бебебе", "7");
+        phoneBook.add("Бебебе", "7");
         phoneBook.add("Бъбъбъ", "8");
         phoneBook.add("Бебебе", "9");
         phoneBook.add("Бъбъбъ", "10");
