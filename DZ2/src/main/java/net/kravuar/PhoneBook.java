@@ -10,7 +10,7 @@ class PhoneBook {
     public void add(String familyName, String phoneNumber) {
         entries.merge(
                 familyName,
-                Set.of(phoneNumber),
+                Collections.singleton(phoneNumber),
                 (oldSet, singleton) -> Stream.of(oldSet, singleton)
                         .flatMap(Set::stream)
                         .collect(Collectors.toSet())
