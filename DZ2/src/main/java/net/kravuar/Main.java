@@ -51,12 +51,12 @@ public class Main {
         System.out.println(byBebebe);
 
         var byBababa = phoneBook.get("Бабаба");
-        assert (byBebebe.size() == 2);
+        assert (byBababa.size() == 2);
         System.out.println("Бабаба");
         System.out.println(byBababa);
 
         var byBibibi = phoneBook.get("Бибиби");
-        assert (byBebebe.size() == 1);
+        assert (byBibibi.size() == 1);
         System.out.println("Бибиби");
         System.out.println(byBibibi);
     }

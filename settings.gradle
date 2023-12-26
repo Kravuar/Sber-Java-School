@@ -1,4 +1,5 @@
 rootProject.name = 'Sber-Java-School'
 include 'DZ1'
 include 'DZ2'
+include 'DZ3'
 

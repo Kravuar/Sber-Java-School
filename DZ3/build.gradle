@@ -1,0 +1,9 @@
+application {
+    mainClass = 'net.kravuar.Main'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'net.kravuar.Main'
+    }
+}
