@@ -1,8 +1,6 @@
 package net.kravuar;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 class PhoneBook {
     private final Map<String, Set<String>> entries = new HashMap<>();
@@ -10,17 +8,20 @@ class PhoneBook {
     public void add(String familyName, String phoneNumber) {
         entries.merge(
                 familyName,
-                Collections.singleton(phoneNumber),
-                (oldSet, singleton) -> Stream.of(oldSet, singleton)
-                        .flatMap(Set::stream)
-                        .collect(Collectors.toSet())
+                new HashSet<>(Collections.singleton(phoneNumber)),
+                (oldSet, singleton) -> {
+                    oldSet.addAll(singleton);
+                    return oldSet;
+                }
         );
     }
 
     public Collection<String> get(String familyName) {
-        return entries.getOrDefault(
-                familyName,
-                Collections.emptySet()
+        return Collections.unmodifiableSet(
+                entries.getOrDefault(
+                    familyName,
+                    Collections.emptySet()
+                )
         );
     }
 }
