@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/DZ4" />
             <option value="$PROJECT_DIR$/DZ4/domain" />
             <option value="$PROJECT_DIR$/DZ4/infrastructure" />
+            <option value="$PROJECT_DIR$/DZ4/infrastructure/CLITerminal" />
             <option value="$PROJECT_DIR$/DZ4/infrastructure/StubbedBank" />
           </set>
         </option>

@@ -8,20 +8,29 @@ import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidAccessTokenException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
+import net.kravuar.terminal.domain.exceptions.terminal.TerminalIsLockedException;
 import net.kravuar.terminal.domain.session.Session;
 import net.kravuar.terminal.spi.BalanceService;
 import net.kravuar.terminal.spi.PinValidator;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 public class TerminalImpl implements Terminal {
+    private static final int LOCK_TIME = 15;
+    private static final int ATTEMPTS_BEFORE_LOCK = 3;
+
     private final BalanceService balanceService;
     private final PinValidator pinValidator;
 
-    private Session activeSession = null;
     @Getter
     private int sessionDuration;
+    private Session activeSession = null;
+
+    private int failedPinAttempts = 0;
+    private LocalDateTime willUnlockAt = LocalDateTime.MIN;
+
 
     /**
      * Constructs a {@code TerminalImpl} with the specified BalanceService, PinValidator and sessionDuration.
@@ -37,6 +46,8 @@ public class TerminalImpl implements Terminal {
 
     @Override
     public double getBalance() throws NoEstablishedSessionException {
+        if (isLocked())
+            throw new TerminalIsLockedException(getLockedDuration(), "getBalance");
         if (!hasActiveSession())
             throw new NoEstablishedSessionException("getBalance");
         try {
@@ -50,6 +61,8 @@ public class TerminalImpl implements Terminal {
 
     @Override
     public double deposit(double amount) throws IllegalArgumentException, NoEstablishedSessionException {
+        if (isLocked())
+            throw new TerminalIsLockedException(getLockedDuration(), "deposit");
         if (amount % 100 != 0)
             throw new IllegalArgumentException("Amount should be divisible by 100.");
         if (!hasActiveSession())
@@ -65,6 +78,8 @@ public class TerminalImpl implements Terminal {
 
     @Override
     public double withdraw(double amount) throws NoEstablishedSessionException, InsufficientFundsException {
+        if (isLocked())
+            throw new TerminalIsLockedException(getLockedDuration(), "withdraw");
         if (amount % 100 != 0)
             throw new IllegalArgumentException("Amount should be divisible by 100.");
         if (!hasActiveSession())
@@ -80,14 +95,27 @@ public class TerminalImpl implements Terminal {
 
     @Override
     public LocalDateTime startSession(CardDetails cardDetails, char[] pin) throws IncorrectPinException {
-        var accessToken = pinValidator.authenticate(cardDetails, pin);
-        var expiresAt = LocalDateTime.now().plusSeconds(sessionDuration);
-        this.activeSession = new Session(
-                cardDetails,
-                accessToken,
-                expiresAt
-        );
-        return expiresAt;
+        if (isLocked())
+            throw new TerminalIsLockedException(getLockedDuration(), "start session");
+
+        try {
+            var accessToken = pinValidator.authenticate(cardDetails, pin);
+            var expiresAt = LocalDateTime.now().plusSeconds(sessionDuration);
+            this.activeSession = new Session(
+                    cardDetails,
+                    accessToken,
+                    expiresAt
+            );
+            return expiresAt;
+        } catch (IncorrectPinException e) {
+            failedPinAttempts++;
+            if (failedPinAttempts == ATTEMPTS_BEFORE_LOCK) {
+                failedPinAttempts = 0;
+                willUnlockAt = LocalDateTime.now().plusSeconds(LOCK_TIME);
+            }
+            throw e;
+        }
+
     }
 
     @Override
@@ -104,10 +132,10 @@ public class TerminalImpl implements Terminal {
     }
 
     @Override
-    public LocalDateTime getActiveSessionExpirationTime() {
+    public Duration getActiveSessionExpirationTime() {
         if (hasActiveSession())
-            return activeSession.expiresAt();
-        return LocalDateTime.MIN;
+            return Duration.between(LocalDateTime.now(), activeSession.expiresAt());
+        throw new NoEstablishedSessionException("getActiveSessionExpirationTime");
     }
 
     @Override
@@ -115,5 +143,17 @@ public class TerminalImpl implements Terminal {
         if (duration < 1)
             throw new IllegalArgumentException("Session duration cannot be less than 1.");
         sessionDuration = duration;
+    }
+
+    @Override
+    public boolean isLocked() {
+        return willUnlockAt.isAfter(LocalDateTime.now());
+    }
+
+    @Override
+    public Duration getLockedDuration() {
+        if (hasActiveSession())
+            return Duration.between(LocalDateTime.now(), willUnlockAt);
+        throw new NoEstablishedSessionException("getLockedDuration");
     }
 }

@@ -5,6 +5,7 @@ import net.kravuar.terminal.domain.exceptions.spi.IncorrectPinException;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -68,9 +69,10 @@ public interface Terminal {
     /**
      * Retrieve current session expiration time.
      *
-     * @return {@code LocalDateTime} representing time at which session will be invalidated. Returns {@code LocalDateTime.MIN}, if there wasn't active session.
+     * @return {@code Duration} representing time at which session will be valid.
+     * @throws NoEstablishedSessionException if there wasn't active session.
      */
-    LocalDateTime getActiveSessionExpirationTime();
+    Duration getActiveSessionExpirationTime();
 
     /**
      * Changes session duration (in seconds). Will be applied starting from the next session.
@@ -86,4 +88,17 @@ public interface Terminal {
      * @return time duration (in seconds).
      */
     int getSessionDuration();
+
+    /**
+     * Check whether terminal is locked.
+     */
+    boolean isLocked();
+
+    /**
+     * Retrieve unlock time.
+     *
+     * @return {@code Duration} representing time after which terminal will be unlocked.
+     * @throws NoEstablishedSessionException if isn't locked.
+     */
+    Duration getLockedDuration();
 }

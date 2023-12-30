@@ -1,5 +1,6 @@
 package net.kravuar;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidAccessTokenException;
@@ -12,6 +13,7 @@ public class StubbedBalanceService implements BalanceService {
     /**
      * The underlying {@code Map} associates account IDs (long as in the demo CardDetails from domain) with account balances.
      */
+    @Getter
     private final Map<Long, Double> accounts;
     private final CardDetailsToAccessTokenMapper accessTokenMapper;
 
