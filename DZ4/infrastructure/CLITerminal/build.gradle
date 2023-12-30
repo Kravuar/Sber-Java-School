@@ -9,3 +9,7 @@ jar {
         attributes 'Main-Class': 'net.kravuar.Main'
     }
 }
+
+dependencies {
+    implementation project(":DZ4:infrastructure:StubbedBank")
+}
