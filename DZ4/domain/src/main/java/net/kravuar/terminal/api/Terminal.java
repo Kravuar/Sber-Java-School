@@ -3,6 +3,8 @@ package net.kravuar.terminal.api;
 import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.terminal.domain.exceptions.spi.IncorrectPinException;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
+import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
+import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 
 import java.time.Duration;
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * The {@code Terminal} interface represents a terminal device with session management.
  * Users of this interface are obligated to check the session validity before invoking session-dependent methods.
- * Otherwise {@code NoEstablishedSessionException} could be thrown.
+ * Otherwise {@code InvalidSessionException} or {@code NoEstablishedSessionException} could be thrown.
  */
 public interface Terminal {
     /**
@@ -19,8 +21,9 @@ public interface Terminal {
      *
      * @return the current balance of the user's account.
      * @throws NoEstablishedSessionException if action attempted without established session.
+     * @throws InvalidSessionException if action attempted with invalid session.
      */
-    double getBalance() throws NoEstablishedSessionException;
+    double getBalance();
 
     /**
      * Deposits the specified amount to the account associated with current session's account.
@@ -29,8 +32,9 @@ public interface Terminal {
      * @return the new balance after the deposit.
      * @throws IllegalArgumentException if the amount is not greater than 0 or not divisible by 100.
      * @throws NoEstablishedSessionException if action attempted without established session.
+     * @throws InvalidSessionException if action attempted with invalid session.
      */
-    double deposit(double amount) throws IllegalArgumentException, NoEstablishedSessionException;
+    double deposit(double amount);
 
     /**
      * Withdraws the specified amount from the account associated with the provided access token.
@@ -40,17 +44,21 @@ public interface Terminal {
      * @throws InsufficientFundsException if the account does not have sufficient funds.
      * @throws IllegalArgumentException if the amount is not greater than 0 or not divisible by 100.
      * @throws NoEstablishedSessionException if action attempted without established session.
+     * @throws InvalidSessionException if action attempted with invalid session.
      */
-    double withdraw(double amount) throws NoEstablishedSessionException, InsufficientFundsException;
+    double withdraw(double amount) throws InsufficientFundsException;
 
     /**
      * Starts session for a given card.
+     * Will block the account after several unsuccessful attempts
+     * (account will be unblocked automatically after some time).
      *
      * @param cardDetails card info.
      * @param pin         The PIN entered by the user as a character array.
      * @return {@code LocalDateTime} representing time at which session will be invalidated.
-     * @throws IllegalArgumentException If the PIN is not in valid format.
-     * @throws IncorrectPinException If the PIN is in valid format, but doesn't match card's real PIN.
+     * @throws IllegalArgumentException if the PIN is not in valid format.
+     * @throws IncorrectPinException if the PIN is in valid format, but doesn't match card's real PIN.
+     * @throws AccountIsLockedException if account is locked.
      */
     LocalDateTime startSession(CardDetails cardDetails, char[] pin) throws IncorrectPinException;
 
@@ -80,25 +88,34 @@ public interface Terminal {
      * @param time duration in seconds.
      * @throws IllegalArgumentException if the {@code time} is less than 1.
      */
-    void setSessionDuration(int time) throws IllegalArgumentException;
+    void setSessionDuration(int time);
 
     /**
-     * Retrieves currently set session duration.
+     * Retrieves currently set session duration parameter.
      *
      * @return time duration (in seconds).
      */
     int getSessionDuration();
 
     /**
-     * Check whether terminal is locked.
+     * Check whether account associated with provided {@code CardDetails} is locked.
      */
-    boolean isLocked();
+    boolean isLocked(CardDetails cardDetails);
 
     /**
-     * Retrieve unlock time.
+     * Retrieve current session's account lock duration.
      *
-     * @return {@code Duration} representing time after which terminal will be unlocked.
-     * @throws NoEstablishedSessionException if isn't locked.
+     * @return {@code Duration} representing time after which account will be unlocked.
+     * @throws IllegalStateException if account isn't locked.
+     * @throws NoEstablishedSessionException if there wasn't active session.
      */
     Duration getLockedDuration();
+
+    /**
+     * Retrieve lock duration of account associated with provided {@code CardDetails}.
+     *
+     * @return {@code Duration} representing time after which account will be unlocked.
+     * @throws IllegalStateException if account isn't locked.
+     */
+    Duration getLockedDuration(CardDetails cardDetails);
 }

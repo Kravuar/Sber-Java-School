@@ -12,4 +12,6 @@ jar {
 
 dependencies {
     implementation project(":DZ4:infrastructure:StubbedBank")
+//    TODO: Why do i have to do that explicitly
+    implementation project(":DZ4:domain")
 }

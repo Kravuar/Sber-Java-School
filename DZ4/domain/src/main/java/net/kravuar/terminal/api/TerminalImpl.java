@@ -7,19 +7,21 @@ import net.kravuar.terminal.domain.exceptions.spi.IncorrectPinException;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidAccessTokenException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
-import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
-import net.kravuar.terminal.domain.exceptions.terminal.TerminalIsLockedException;
+import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
+import net.kravuar.terminal.domain.lock.LockStorage;
 import net.kravuar.terminal.domain.session.Session;
 import net.kravuar.terminal.spi.BalanceService;
 import net.kravuar.terminal.spi.PinValidator;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @RequiredArgsConstructor
 public class TerminalImpl implements Terminal {
-    private static final int LOCK_TIME = 15;
     private static final int ATTEMPTS_BEFORE_LOCK = 3;
+    private static final Duration LOCK_TIME = Duration.of(15, ChronoUnit.SECONDS);
+    private static final Duration ATTEMPTS_RESET_AFTER = Duration.of(30, ChronoUnit.SECONDS);
 
     private final BalanceService balanceService;
     private final PinValidator pinValidator;
@@ -28,8 +30,7 @@ public class TerminalImpl implements Terminal {
     private int sessionDuration;
     private Session activeSession = null;
 
-    private int failedPinAttempts = 0;
-    private LocalDateTime willUnlockAt = LocalDateTime.MIN;
+    private final LockStorage lockStorage = new LockStorage(ATTEMPTS_RESET_AFTER);
 
 
     /**
@@ -45,49 +46,43 @@ public class TerminalImpl implements Terminal {
     }
 
     @Override
-    public double getBalance() throws NoEstablishedSessionException {
-        if (isLocked())
-            throw new TerminalIsLockedException(getLockedDuration(), "getBalance");
+    public double getBalance()  {
         if (!hasActiveSession())
-            throw new NoEstablishedSessionException("getBalance");
+            throw new IllegalStateException("No session established.");
         try {
             return balanceService.getBalance(activeSession.accessToken());
         } catch (InvalidAccessTokenException e) {
-            var wrapped = new InvalidSessionException("getBalance");
+            var wrapped = new InvalidSessionException();
             wrapped.initCause(e);
             throw wrapped;
         }
     }
 
     @Override
-    public double deposit(double amount) throws IllegalArgumentException, NoEstablishedSessionException {
-        if (isLocked())
-            throw new TerminalIsLockedException(getLockedDuration(), "deposit");
+    public double deposit(double amount) {
         if (amount % 100 != 0)
             throw new IllegalArgumentException("Amount should be divisible by 100.");
         if (!hasActiveSession())
-            throw new NoEstablishedSessionException("deposit");
+            throw new IllegalStateException("No session established.");
         try {
             return balanceService.deposit(activeSession.accessToken(), amount);
         } catch (InvalidAccessTokenException e) {
-            var wrapped = new InvalidSessionException("deposit");
+            var wrapped = new InvalidSessionException();
             wrapped.initCause(e);
             throw wrapped;
         }
     }
 
     @Override
-    public double withdraw(double amount) throws NoEstablishedSessionException, InsufficientFundsException {
-        if (isLocked())
-            throw new TerminalIsLockedException(getLockedDuration(), "withdraw");
+    public double withdraw(double amount) throws InsufficientFundsException {
+        if (!hasActiveSession())
+            throw new IllegalStateException("No session established.");
         if (amount % 100 != 0)
             throw new IllegalArgumentException("Amount should be divisible by 100.");
-        if (!hasActiveSession())
-            throw new NoEstablishedSessionException("withdraw");
         try {
             return balanceService.withdraw(activeSession.accessToken(), amount);
         } catch (InvalidAccessTokenException e) {
-            var wrapped = new InvalidSessionException("withdraw");
+            var wrapped = new InvalidSessionException();
             wrapped.initCause(e);
             throw wrapped;
         }
@@ -95,8 +90,8 @@ public class TerminalImpl implements Terminal {
 
     @Override
     public LocalDateTime startSession(CardDetails cardDetails, char[] pin) throws IncorrectPinException {
-        if (isLocked())
-            throw new TerminalIsLockedException(getLockedDuration(), "start session");
+        if (isLocked(cardDetails))
+            throw new AccountIsLockedException(getLockedDuration());
 
         try {
             var accessToken = pinValidator.authenticate(cardDetails, pin);
@@ -108,14 +103,11 @@ public class TerminalImpl implements Terminal {
             );
             return expiresAt;
         } catch (IncorrectPinException e) {
-            failedPinAttempts++;
-            if (failedPinAttempts == ATTEMPTS_BEFORE_LOCK) {
-                failedPinAttempts = 0;
-                willUnlockAt = LocalDateTime.now().plusSeconds(LOCK_TIME);
-            }
+            lockStorage.putFailAttempt(cardDetails);
+            if (lockStorage.getFailAttempts(cardDetails) == ATTEMPTS_BEFORE_LOCK)
+                lockStorage.lock(cardDetails, LOCK_TIME);
             throw e;
         }
-
     }
 
     @Override
@@ -135,7 +127,7 @@ public class TerminalImpl implements Terminal {
     public Duration getActiveSessionExpirationTime() {
         if (hasActiveSession())
             return Duration.between(LocalDateTime.now(), activeSession.expiresAt());
-        throw new NoEstablishedSessionException("getActiveSessionExpirationTime");
+        throw new IllegalStateException("No session established.");
     }
 
     @Override
@@ -146,14 +138,21 @@ public class TerminalImpl implements Terminal {
     }
 
     @Override
-    public boolean isLocked() {
-        return willUnlockAt.isAfter(LocalDateTime.now());
+    public boolean isLocked(CardDetails cardDetails) {
+        return lockStorage.isLocked(cardDetails);
     }
 
     @Override
     public Duration getLockedDuration() {
-        if (hasActiveSession())
-            return Duration.between(LocalDateTime.now(), willUnlockAt);
-        throw new NoEstablishedSessionException("getLockedDuration");
+        if (hasActiveSession()) {
+            var cardDetails = activeSession.cardDetails();
+            return getLockedDuration(cardDetails);
+        }
+        throw new IllegalStateException("No session established.");
+    }
+
+    @Override
+    public Duration getLockedDuration(CardDetails cardDetails) {
+        return lockStorage.getLockDuration(cardDetails);
     }
 }

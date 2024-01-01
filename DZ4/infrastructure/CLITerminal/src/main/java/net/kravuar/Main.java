@@ -2,7 +2,9 @@ package net.kravuar;
 
 import net.kravuar.terminal.api.Terminal;
 import net.kravuar.terminal.api.TerminalImpl;
+import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
+import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 import net.kravuar.terminal.spi.BalanceService;
 import net.kravuar.terminal.spi.PinValidator;
@@ -20,10 +22,10 @@ public class Main {
     static {
         mapper = new IdBasedCardDetailsToAccessTokenMapperImpl();
 
-        var db = new HashMap<Long, Double>();
-        db.put(1L, 99.9);
-        db.put(2L, 43509d);
-        db.put(3L, 1d);
+        var db = new HashMap<CardDetails, Double>();
+        db.put(new CardDetails(1L), 99.9);
+        db.put(new CardDetails(2L), 43509d);
+        db.put(new CardDetails(3L), 1d);
         balanceService = new StubbedBalanceService(db, mapper);
 
         pinValidator = new StubbedPinValidator(mapper);
@@ -56,7 +58,7 @@ public class Main {
                     handleEndSession();
                     break;
                 case 6:
-                    handleSessionInfo();
+                    handleGetSessionExpirationTime();
                     break;
                 case 7:
                     handleSetSessionDuration();
@@ -86,10 +88,10 @@ public class Main {
         System.out.println("3. Withdraw");
         System.out.println("4. Start Session");
         System.out.println("5. End Session");
-        System.out.println("6. Session Info");
+        System.out.println("6. Get Session Expiration Duration");
         System.out.println("7. Set Session Duration");
         System.out.println("8. Get Session Duration");
-        System.out.println("9. Check if Terminal is Locked");
+        System.out.println("9. Check if account is Locked");
         System.out.println("10. Get Locked Duration");
         System.out.println("11. Exit");
         System.out.print("Enter your choice: ");
@@ -98,15 +100,15 @@ public class Main {
     private static void handleViewDB() {
         var stubbed = (StubbedBalanceService) balanceService;
         System.out.println("Bank DB:");
-        System.out.println(stubbed);
+        System.out.println(stubbed.getAccounts());
     }
 
     private static void handleGetBalance() {
         try {
             double balance = terminal.getBalance();
             System.out.println("Current balance: " + balance);
-        } catch (NoEstablishedSessionException e) {
-            System.out.println("No established session. " + e.getMessage());
+        } catch (NoEstablishedSessionException | InvalidSessionException e) {
+            System.err.println("Session Problems: " + e.getMessage());
         }
     }
 
@@ -118,9 +120,9 @@ public class Main {
             double newBalance = terminal.deposit(amount);
             System.out.println("New balance after deposit: " + newBalance);
         } catch (IllegalArgumentException e) {
-            System.out.println("Deposit Error: " + e.getMessage());
-        } catch (NoEstablishedSessionException e) {
-            System.out.println("No established session. " + e.getMessage());
+            System.err.println("Deposit Error: " + e.getMessage());
+        } catch (NoEstablishedSessionException | InvalidSessionException e) {
+            System.err.println("Session Problems: " + e.getMessage());
         }
     }
 
@@ -131,10 +133,10 @@ public class Main {
         try {
             double newBalance = terminal.withdraw(amount);
             System.out.println("New balance after withdrawal: " + newBalance);
-        } catch (NoEstablishedSessionException e) {
-            System.out.println("No established session. " + e.getMessage());
+        } catch (NoEstablishedSessionException | InvalidSessionException e) {
+            System.err.println("Session Problems: " + e.getMessage());
         } catch (InsufficientFundsException | IllegalArgumentException e) {
-            System.out.println("Withdraw Error: " + e.getMessage());
+            System.err.println("Withdraw Error: " + e.getMessage());
         }
     }
 
@@ -148,12 +150,12 @@ public class Main {
         System.out.println("Session ended: " + ended);
     }
 
-    private static void handleSessionInfo() {
+    private static void handleGetSessionExpirationTime() {
         try {
             var expirationTime = terminal.getActiveSessionExpirationTime();
             System.out.println("Session will be active for: " + expirationTime);
         } catch (NoEstablishedSessionException e) {
-            System.out.println("No established session. " + e.getMessage());
+            System.err.println("Session Problems: " + e.getMessage());
         }
     }
 
@@ -165,26 +167,33 @@ public class Main {
             terminal.setSessionDuration(duration);
             System.out.println("Session duration set successfully.");
         } catch (IllegalArgumentException e) {
-            System.out.println("Invalid duration: " + e.getMessage());
+            System.err.println("Invalid duration: " + e.getMessage());
         }
     }
 
     private static void handleGetSessionDuration() {
         int duration = terminal.getSessionDuration();
-        System.out.println("Current session duration: " + duration + " seconds");
+        System.out.println("New session will be valid for: " + duration + " seconds");
     }
 
     private static void handleIsLocked() {
-        boolean isLocked = terminal.isLocked();
-        System.out.println("Terminal is locked: " + isLocked);
+        System.out.println("Enter card id: ");
+        int id = scanner.nextInt();
+        var cardDetails = new CardDetails(id);
+        boolean isLocked = terminal.isLocked(cardDetails);
+        System.out.println("Account is locked: " + isLocked);
     }
 
     private static void handleGetLockedDuration() {
+        System.out.println("Enter card id: ");
+        int id = scanner.nextInt();
+        var cardDetails = new CardDetails(id);
+
         try {
-            var lockedDuration = terminal.getLockedDuration();
-            System.out.println("Terminal will be locked for: " + lockedDuration);
-        } catch (NoEstablishedSessionException e) {
-            System.out.println("No established session. " + e.getMessage());
+            var lockedDuration = terminal.getLockedDuration(cardDetails);
+            System.out.println("Account will be locked for: " + lockedDuration);
+        } catch (IllegalStateException e) {
+            System.err.println("Account isn't locked.");
         }
     }
 }
