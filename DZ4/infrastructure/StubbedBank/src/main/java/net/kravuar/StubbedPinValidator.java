@@ -2,10 +2,10 @@ package net.kravuar;
 
 import lombok.RequiredArgsConstructor;
 import net.kravuar.terminal.domain.card.CardDetails;
-import net.kravuar.terminal.domain.exceptions.spi.IncorrectPinException;
+import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
 import net.kravuar.terminal.spi.PinValidator;
 
-import java.util.stream.IntStream;
+import java.util.Optional;
 
 /**
  * Validates pin only if the last digit is {@code SPECIAL_DIGIT}.
@@ -16,11 +16,13 @@ public class StubbedPinValidator implements PinValidator {
     private final CardDetailsToAccessTokenMapper mapper;
 
     @Override
-    public String authenticate(CardDetails cardDetails, char[] pin) throws IncorrectPinException {
-        if (pin.length != 4 || !IntStream.range(0, 4).mapToObj(i -> pin[i]).allMatch(Character::isDigit))
+    public Optional<String> authenticate(CardDetails cardDetails, int pin) {
+        if (cardDetails.id() < 0)
+            throw new InvalidCardDetailsException();
+        if (pin <= 999 || pin > 9999)
             throw new IllegalArgumentException("Incorrect pin format.");
-        if (pin[3] != SPECIAL_DIGIT)
-            throw new IncorrectPinException();
-        return mapper.toToken(cardDetails);
+        if (pin % 10 != SPECIAL_DIGIT)
+            return Optional.empty();
+        return Optional.of(mapper.toToken(cardDetails));
     }
 }

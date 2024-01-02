@@ -1,14 +1,13 @@
 package net.kravuar.terminal.api;
 
 import net.kravuar.terminal.domain.card.CardDetails;
-import net.kravuar.terminal.domain.exceptions.spi.IncorrectPinException;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
+import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
 import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 /**
  * The {@code Terminal} interface represents a terminal device with session management.
@@ -54,13 +53,13 @@ public interface Terminal {
      * (account will be unblocked automatically after some time).
      *
      * @param cardDetails card info.
-     * @param pin         The PIN entered by the user as a character array.
-     * @return {@code LocalDateTime} representing time at which session will be invalidated.
+     * @param pin The PIN entered by the user as a single integer.
+     * @return {@code boolean} indicating whether PIN was correct (session started).
      * @throws IllegalArgumentException if the PIN is not in valid format.
-     * @throws IncorrectPinException if the PIN is in valid format, but doesn't match card's real PIN.
+     * @throws InvalidCardDetailsException if the provided CardDetails are invalid.
      * @throws AccountIsLockedException if account is locked.
      */
-    LocalDateTime startSession(CardDetails cardDetails, char[] pin) throws IncorrectPinException;
+    boolean startSession(CardDetails cardDetails, int pin);
 
     /**
      * Ends the session ahead of schedule.
@@ -85,17 +84,17 @@ public interface Terminal {
     /**
      * Changes session duration (in seconds). Will be applied starting from the next session.
      *
-     * @param time duration in seconds.
-     * @throws IllegalArgumentException if the {@code time} is less than 1.
+     * @param duration duration of the session.
+     * @throws IllegalArgumentException if the {@code duration} is not positive.
      */
-    void setSessionDuration(int time);
+    void setSessionDuration(Duration duration);
 
     /**
      * Retrieves currently set session duration parameter.
      *
      * @return time duration (in seconds).
      */
-    int getSessionDuration();
+    Duration getSessionDuration();
 
     /**
      * Check whether account associated with provided {@code CardDetails} is locked.

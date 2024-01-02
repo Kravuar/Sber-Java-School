@@ -9,9 +9,6 @@ import lombok.Getter;
  */
 @Getter
 public class InvalidSessionException extends RuntimeException {
-    /**
-     * Constructs a {@code InvalidSessionException} with the specified attempted action name.
-     */
     public InvalidSessionException() {
         super("Session invalid.");
     }

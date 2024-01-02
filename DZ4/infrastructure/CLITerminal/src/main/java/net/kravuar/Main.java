@@ -4,12 +4,16 @@ import net.kravuar.terminal.api.Terminal;
 import net.kravuar.terminal.api.TerminalImpl;
 import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
+import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
+import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 import net.kravuar.terminal.spi.BalanceService;
 import net.kravuar.terminal.spi.PinValidator;
 
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -30,14 +34,21 @@ public class Main {
 
         pinValidator = new StubbedPinValidator(mapper);
 
-        terminal = new TerminalImpl(balanceService, pinValidator);
+        terminal = new TerminalImpl(
+                balanceService,
+                pinValidator,
+                3,
+                Duration.ofSeconds(20),
+                Duration.ofSeconds(30),
+                Duration.ofSeconds(40)
+        );
     }
 
     public static void main(String[] args) {
         while (true) {
             displayMenu();
             int choice = scanner.nextInt();
-
+            System.out.println();
             switch (choice) {
                 case 0:
                     handleViewDB();
@@ -78,6 +89,7 @@ public class Main {
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
+            System.out.println("============================================================");
         }
     }
 
@@ -108,7 +120,7 @@ public class Main {
             double balance = terminal.getBalance();
             System.out.println("Current balance: " + balance);
         } catch (NoEstablishedSessionException | InvalidSessionException e) {
-            System.err.println("Session Problems: " + e.getMessage());
+            System.out.println("Session Problems: " + e.getMessage());
         }
     }
 
@@ -120,9 +132,9 @@ public class Main {
             double newBalance = terminal.deposit(amount);
             System.out.println("New balance after deposit: " + newBalance);
         } catch (IllegalArgumentException e) {
-            System.err.println("Deposit Error: " + e.getMessage());
+            System.out.println("Deposit Error: " + e.getMessage());
         } catch (NoEstablishedSessionException | InvalidSessionException e) {
-            System.err.println("Session Problems: " + e.getMessage());
+            System.out.println("Session Problems: " + e.getMessage());
         }
     }
 
@@ -134,15 +146,54 @@ public class Main {
             double newBalance = terminal.withdraw(amount);
             System.out.println("New balance after withdrawal: " + newBalance);
         } catch (NoEstablishedSessionException | InvalidSessionException e) {
-            System.err.println("Session Problems: " + e.getMessage());
+            System.out.println("Session Problems: " + e.getMessage());
         } catch (InsufficientFundsException | IllegalArgumentException e) {
-            System.err.println("Withdraw Error: " + e.getMessage());
+            System.out.println("Withdraw Error: " + e.getMessage());
         }
     }
 
     private static void handleStartSession() {
-        // TODO: gather card, pin
-        // terminal.startSession(cardDetails, pin)
+        System.out.print("Enter account ID: ");
+        long id = scanner.nextLong();
+        CardDetails cardDetails = new CardDetails(id);
+
+        if (terminal.isLocked(cardDetails)) {
+            System.out.println("Account is locked. Cannot proceed.");
+            System.out.println("It will be locked for: " + terminal.getLockedDuration(cardDetails));
+            return;
+        }
+
+        int pin = 0;
+        System.out.println("Enter pin digit by digit: ");
+        for (int i = 0; i < 4; i++) {
+            try {
+                int digit = scanner.nextInt();
+                if (digit < 0 || digit > 9)
+                    throw new InputMismatchException("Only single digit expected");
+
+                pin = pin * 10 + digit;
+
+                System.out.println("PIN: " + pin);
+            } catch (InputMismatchException e) {
+                System.out.println("Error upon entering digit: " + e.getMessage());
+                scanner.next();
+                --i;
+            }
+        }
+
+        try {
+            var sessionStarted = terminal.startSession(cardDetails, pin);
+            if (sessionStarted)
+                System.out.println("Session started successfully.");
+            else
+                System.out.println("Session wasn't started. Incorrect pin.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("PIN in invalid format.");
+        } catch (AccountIsLockedException e) {
+            System.out.println("Account is locked. Cannot start session.");
+        } catch (InvalidCardDetailsException e) {
+            System.out.println("Provided card details are invalid. Cannot start session.");
+        }
     }
 
     private static void handleEndSession() {
@@ -155,7 +206,7 @@ public class Main {
             var expirationTime = terminal.getActiveSessionExpirationTime();
             System.out.println("Session will be active for: " + expirationTime);
         } catch (NoEstablishedSessionException e) {
-            System.err.println("Session Problems: " + e.getMessage());
+            System.out.println("Session Problems: " + e.getMessage());
         }
     }
 
@@ -164,16 +215,16 @@ public class Main {
         int duration = scanner.nextInt();
 
         try {
-            terminal.setSessionDuration(duration);
+            terminal.setSessionDuration(Duration.ofSeconds(duration));
             System.out.println("Session duration set successfully.");
         } catch (IllegalArgumentException e) {
-            System.err.println("Invalid duration: " + e.getMessage());
+            System.out.println("Invalid duration: " + e.getMessage());
         }
     }
 
     private static void handleGetSessionDuration() {
-        int duration = terminal.getSessionDuration();
-        System.out.println("New session will be valid for: " + duration + " seconds");
+        var duration = terminal.getSessionDuration();
+        System.out.println("New session will be valid for: " + duration);
     }
 
     private static void handleIsLocked() {
@@ -193,7 +244,7 @@ public class Main {
             var lockedDuration = terminal.getLockedDuration(cardDetails);
             System.out.println("Account will be locked for: " + lockedDuration);
         } catch (IllegalStateException e) {
-            System.err.println("Account isn't locked.");
+            System.out.println("Account isn't locked.");
         }
     }
 }

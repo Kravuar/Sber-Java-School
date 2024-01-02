@@ -1,6 +1,7 @@
 package net.kravuar;
 
 import net.kravuar.terminal.domain.card.CardDetails;
+import net.kravuar.terminal.domain.exceptions.spi.InvalidAccessTokenException;
 
 /**
  * Bidirectional mapping from {@code CardDetails} to {@code String} representation.
@@ -19,7 +20,7 @@ public interface CardDetailsToAccessTokenMapper {
      * Parses access token and constructs {@code CardDetails} from it.
      *
      * @param token string representation of an access token.
-     * @throws net.kravuar.terminal.domain.exceptions.spi.InvalidAccessTokenException if token is invalid.
+     * @throws InvalidAccessTokenException if token is invalid.
      * @return {@code CardDetails} parsed from provided token
      */
     CardDetails toDetails(String token);
