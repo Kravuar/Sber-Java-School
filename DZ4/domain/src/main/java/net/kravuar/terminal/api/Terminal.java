@@ -22,7 +22,7 @@ public interface Terminal {
      * @throws NoEstablishedSessionException if action attempted without established session.
      * @throws InvalidSessionException if action attempted with invalid session.
      */
-    double getBalance();
+    double getBalance() throws InvalidSessionException;
 
     /**
      * Deposits the specified amount to the account associated with current session's account.
@@ -33,7 +33,7 @@ public interface Terminal {
      * @throws NoEstablishedSessionException if action attempted without established session.
      * @throws InvalidSessionException if action attempted with invalid session.
      */
-    double deposit(double amount);
+    double deposit(double amount) throws InvalidSessionException;
 
     /**
      * Withdraws the specified amount from the account associated with the provided access token.
@@ -45,7 +45,7 @@ public interface Terminal {
      * @throws NoEstablishedSessionException if action attempted without established session.
      * @throws InvalidSessionException if action attempted with invalid session.
      */
-    double withdraw(double amount) throws InsufficientFundsException;
+    double withdraw(double amount) throws InsufficientFundsException, InvalidSessionException;
 
     /**
      * Starts session for a given card.
@@ -53,13 +53,13 @@ public interface Terminal {
      * (account will be unblocked automatically after some time).
      *
      * @param cardDetails card info.
-     * @param pin The PIN entered by the user as a single integer.
+     * @param pin The PIN entered by the user.
      * @return {@code boolean} indicating whether PIN was correct (session started).
      * @throws IllegalArgumentException if the PIN is not in valid format.
      * @throws InvalidCardDetailsException if the provided CardDetails are invalid.
      * @throws AccountIsLockedException if account is locked.
      */
-    boolean startSession(CardDetails cardDetails, int pin);
+    boolean startSession(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException;
 
     /**
      * Ends the session ahead of schedule.
@@ -79,7 +79,7 @@ public interface Terminal {
      * @return {@code Duration} representing time at which session will be valid.
      * @throws NoEstablishedSessionException if there wasn't active session.
      */
-    Duration getActiveSessionExpirationTime();
+    Duration getActiveSessionDuration();
 
     /**
      * Changes session duration (in seconds). Will be applied starting from the next session.

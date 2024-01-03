@@ -6,22 +6,23 @@ import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
 import net.kravuar.terminal.spi.PinValidator;
 
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 /**
  * Validates pin only if the last digit is {@code SPECIAL_DIGIT}.
  */
 @RequiredArgsConstructor
 public class StubbedPinValidator implements PinValidator {
-    private static final int SPECIAL_DIGIT = 0;
+    private static final char SPECIAL_DIGIT = '0';
     private final CardDetailsToAccessTokenMapper mapper;
 
     @Override
-    public Optional<String> authenticate(CardDetails cardDetails, int pin) {
-        if (cardDetails.id() < 0)
+    public Optional<String> authenticate(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException {
+        if (cardDetails.id() < 0) // Could be much more complex stuff
             throw new InvalidCardDetailsException();
-        if (pin <= 999 || pin > 9999)
+        if (pin.length != 4 || !IntStream.range(0, 4).mapToObj(i -> pin[i]).allMatch(Character::isDigit))
             throw new IllegalArgumentException("Incorrect pin format.");
-        if (pin % 10 != SPECIAL_DIGIT)
+        if (pin[3] != SPECIAL_DIGIT)
             return Optional.empty();
         return Optional.of(mapper.toToken(cardDetails));
     }

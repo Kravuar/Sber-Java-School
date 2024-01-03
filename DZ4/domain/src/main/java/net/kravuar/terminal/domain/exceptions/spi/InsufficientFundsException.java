@@ -10,18 +10,18 @@ import lombok.Getter;
 @Getter
 public class InsufficientFundsException extends Exception {
     /**
-     * The amount requested in the failed transaction.
+     * The shortfall amount of the failed transaction.
      */
-    private final double requestedAmount;
+    private final double shortfall;
 
     /**
-     * Constructs an {@code InsufficientFundsException} with the specified requested amount.
+     * Constructs an {@code InsufficientFundsException} with the specified shortfall amount.
      *
-     * @param requestedAmount The amount requested in the failed transaction.
+     * @param shortfall The shortfall amount of the transaction.
      */
-    public InsufficientFundsException(double requestedAmount) {
-        super(String.format("Transaction failed due to insufficient funds. Requested amount: %.2f", requestedAmount));
-        this.requestedAmount = requestedAmount;
+    public InsufficientFundsException(double shortfall) {
+        super(String.format("Transaction failed due to insufficient funds. Shortfall amount: %.2f", shortfall));
+        this.shortfall = shortfall;
     }
 }
 

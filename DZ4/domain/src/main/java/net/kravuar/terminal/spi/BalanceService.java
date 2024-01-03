@@ -16,7 +16,7 @@ public interface BalanceService {
      * @return the current balance of the user's account.
      * @throws InvalidAccessTokenException if the service failed to authorize the operation due to an invalid access token.
      */
-    double getBalance(String accessToken);
+    double getBalance(String accessToken) throws InvalidAccessTokenException;
 
     /**
      * Deposits the specified amount to the account associated with the provided access token.
@@ -27,7 +27,7 @@ public interface BalanceService {
      * @throws IllegalArgumentException if the amount is not greater than 0.
      * @throws InvalidAccessTokenException if the service failed to authorize the operation due to an invalid access token.
      */
-    double deposit(String accessToken, double amount);
+    double deposit(String accessToken, double amount) throws InvalidAccessTokenException;
 
     /**
      * Withdraws the specified amount from the account associated with the provided access token.
@@ -39,5 +39,5 @@ public interface BalanceService {
      * @throws InsufficientFundsException if the account does not have sufficient funds.
      * @throws InvalidAccessTokenException if the service failed to authorize the operation due to an invalid access token.
      */
-    double withdraw(String accessToken, double amount) throws InsufficientFundsException;
+    double withdraw(String accessToken, double amount) throws InsufficientFundsException, InvalidAccessTokenException;
 }

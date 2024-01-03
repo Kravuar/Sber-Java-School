@@ -35,7 +35,7 @@ public class StubbedBalanceService implements BalanceService {
         var cardDetails = accessTokenMapper.toDetails(accessToken);
         var currentAmount = accounts.get(cardDetails);
         if (currentAmount < amount)
-            throw new InsufficientFundsException(amount);
+            throw new InsufficientFundsException(amount - currentAmount);
         return accounts.merge(cardDetails, -amount, Double::sum);
     }
 }

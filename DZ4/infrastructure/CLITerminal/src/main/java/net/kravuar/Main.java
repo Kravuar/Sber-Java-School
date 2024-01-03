@@ -12,6 +12,7 @@ import net.kravuar.terminal.spi.BalanceService;
 import net.kravuar.terminal.spi.PinValidator;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -38,8 +39,8 @@ public class Main {
                 balanceService,
                 pinValidator,
                 3,
-                Duration.ofSeconds(20),
                 Duration.ofSeconds(30),
+                Duration.ofSeconds(15),
                 Duration.ofSeconds(40)
         );
     }
@@ -163,17 +164,19 @@ public class Main {
             return;
         }
 
-        int pin = 0;
+        var pin = new char[4];
         System.out.println("Enter pin digit by digit: ");
         for (int i = 0; i < 4; i++) {
             try {
-                int digit = scanner.nextInt();
-                if (digit < 0 || digit > 9)
-                    throw new InputMismatchException("Only single digit expected");
+                var input = scanner.next();
+                if (input.length() > 1 || input.isBlank())
+                    throw new InputMismatchException("Received more than 1 character or a blank input");
+                var inputChar = input.charAt(0);
+                if (!Character.isDefined(inputChar))
+                    throw new InputMismatchException("Received non digit character");
+                pin[i] = inputChar;
 
-                pin = pin * 10 + digit;
-
-                System.out.println("PIN: " + pin);
+                System.out.println("PIN: " + Arrays.toString(pin));
             } catch (InputMismatchException e) {
                 System.out.println("Error upon entering digit: " + e.getMessage());
                 scanner.next();
@@ -203,7 +206,7 @@ public class Main {
 
     private static void handleGetSessionExpirationTime() {
         try {
-            var expirationTime = terminal.getActiveSessionExpirationTime();
+            var expirationTime = terminal.getActiveSessionDuration();
             System.out.println("Session will be active for: " + expirationTime);
         } catch (NoEstablishedSessionException e) {
             System.out.println("Session Problems: " + e.getMessage());

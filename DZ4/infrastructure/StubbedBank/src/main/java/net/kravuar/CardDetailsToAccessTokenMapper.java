@@ -20,8 +20,7 @@ public interface CardDetailsToAccessTokenMapper {
      * Parses access token and constructs {@code CardDetails} from it.
      *
      * @param token string representation of an access token.
-     * @throws InvalidAccessTokenException if token is invalid.
      * @return {@code CardDetails} parsed from provided token
      */
-    CardDetails toDetails(String token);
+    CardDetails toDetails(String token) throws InvalidAccessTokenException;
 }

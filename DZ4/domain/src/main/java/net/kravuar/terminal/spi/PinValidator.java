@@ -14,11 +14,11 @@ public interface PinValidator {
      * Authenticates a user's PIN for a given card.
      *
      * @param cardDetails card info.
-     * @param pin The PIN entered by the user as a single integer.
-     * @return An accessToken containing {some stuff (like some of the card details, terminal info...)}
-     *         to be used in subsequent requests to other bank services.
+     * @param pin PIN entered by the user.
+     * @return accessToken containing {some stuff (like some of the card details, terminal info...)}
+     *         to be used in subsequent requests to other bank services. Returns {@code Optional.empty()} if pin is incorrect.
      * @throws IllegalArgumentException if the PIN is not in valid format.
-     * @throws InvalidCardDetailsException If the provided {@code CardDetails} are invalid.
+     * @throws InvalidCardDetailsException if the provided {@code CardDetails} are invalid.
      */
-    Optional<String> authenticate(CardDetails cardDetails, int pin);
+    Optional<String> authenticate(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException;
 }

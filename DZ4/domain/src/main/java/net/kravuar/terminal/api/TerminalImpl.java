@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidAccessTokenException;
+import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
@@ -46,7 +47,7 @@ public class TerminalImpl implements Terminal {
     }
 
     @Override
-    public double getBalance()  {
+    public double getBalance() throws InvalidSessionException {
         if (!hasActiveSession())
             throw new NoEstablishedSessionException();
         try {
@@ -54,29 +55,31 @@ public class TerminalImpl implements Terminal {
         } catch (InvalidAccessTokenException e) {
             var wrapped = new InvalidSessionException();
             wrapped.initCause(e);
+            endSession();
             throw wrapped;
         }
     }
 
     @Override
-    public double deposit(double amount) {
+    public double deposit(double amount) throws InvalidSessionException {
         if (amount % 100 != 0)
             throw new IllegalArgumentException("Amount should be divisible by 100.");
         if (!hasActiveSession())
-            throw new IllegalStateException("No session established.");
+            throw new NoEstablishedSessionException();
         try {
             return balanceService.deposit(activeSession.accessToken(), amount);
         } catch (InvalidAccessTokenException e) {
             var wrapped = new InvalidSessionException();
             wrapped.initCause(e);
+            endSession();
             throw wrapped;
         }
     }
 
     @Override
-    public double withdraw(double amount) throws InsufficientFundsException {
+    public double withdraw(double amount) throws InsufficientFundsException, InvalidSessionException {
         if (!hasActiveSession())
-            throw new IllegalStateException("No session established.");
+            throw new NoEstablishedSessionException();
         if (amount % 100 != 0)
             throw new IllegalArgumentException("Amount should be divisible by 100.");
         try {
@@ -84,12 +87,13 @@ public class TerminalImpl implements Terminal {
         } catch (InvalidAccessTokenException e) {
             var wrapped = new InvalidSessionException();
             wrapped.initCause(e);
+            endSession();
             throw wrapped;
         }
     }
 
     @Override
-    public boolean startSession(CardDetails cardDetails, int pin) {
+    public boolean startSession(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException {
         if (isLocked(cardDetails))
             throw new AccountIsLockedException(getLockedDuration());
 
@@ -118,18 +122,18 @@ public class TerminalImpl implements Terminal {
 
     @Override
     public boolean hasActiveSession() {
-        return activeSession != null && activeSession.expiresAt().isAfter(LocalDateTime.now());
+        return activeSession != null && activeSession.isActive();
     }
 
     @Override
-    public Duration getActiveSessionExpirationTime() {
+    public Duration getActiveSessionDuration() {
         if (hasActiveSession())
             return Duration.between(LocalDateTime.now(), activeSession.expiresAt());
-        throw new IllegalStateException("No session established.");
+        throw new NoEstablishedSessionException();
     }
 
     @Override
-    public void setSessionDuration(Duration duration) throws IllegalArgumentException {
+    public void setSessionDuration(Duration duration) {
         if (!duration.isPositive())
             throw new IllegalArgumentException("Session duration should be positive.");
         sessionDuration = duration;
@@ -146,7 +150,7 @@ public class TerminalImpl implements Terminal {
             var cardDetails = activeSession.cardDetails();
             return getLockedDuration(cardDetails);
         }
-        throw new IllegalStateException("No session established.");
+        throw new NoEstablishedSessionException();
     }
 
     @Override

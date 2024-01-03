@@ -13,12 +13,14 @@ public class IdBasedCardDetailsToAccessTokenMapperImpl implements CardDetailsToA
     }
 
     @Override
-    public CardDetails toDetails(String token) {
+    public CardDetails toDetails(String token) throws InvalidAccessTokenException {
         try {
             var id = Long.parseLong(token);
             return new CardDetails(id);
-        } catch (NumberFormatException ignored) {
-            throw new InvalidAccessTokenException(token);
+        } catch (NumberFormatException e) {
+            var wrapped = new InvalidAccessTokenException(token);
+            wrapped.initCause(e);
+            throw wrapped;
         }
     }
 }

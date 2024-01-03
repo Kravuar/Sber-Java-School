@@ -6,7 +6,7 @@ import lombok.Getter;
  * Exception thrown when the authorization of an operation fails due to an invalid access token.
  */
 @Getter
-public class InvalidAccessTokenException extends RuntimeException {
+public class InvalidAccessTokenException extends Exception {
     /**
      * The access token associated with the failed authorization attempt.
      */
