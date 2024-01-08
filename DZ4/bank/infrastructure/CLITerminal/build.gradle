@@ -1,0 +1,17 @@
+apply plugin: 'application'
+
+application {
+    mainClass = 'net.kravuar.Main'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'net.kravuar.Main'
+    }
+}
+
+dependencies {
+    implementation project(":DZ4:bank:infrastructure:StubbedBank")
+//    TODO: Why do i have to do that explicitly
+    implementation project(":DZ4:bank:domain")
+}

@@ -1,5 +1,0 @@
-dependencies {
-    implementation project(":DZ4:domain")
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
-}

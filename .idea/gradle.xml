@@ -13,10 +13,11 @@
             <option value="$PROJECT_DIR$/DZ2" />
             <option value="$PROJECT_DIR$/DZ3" />
             <option value="$PROJECT_DIR$/DZ4" />
-            <option value="$PROJECT_DIR$/DZ4/domain" />
-            <option value="$PROJECT_DIR$/DZ4/infrastructure" />
-            <option value="$PROJECT_DIR$/DZ4/infrastructure/CLITerminal" />
-            <option value="$PROJECT_DIR$/DZ4/infrastructure/StubbedBank" />
+            <option value="$PROJECT_DIR$/DZ4/bank" />
+            <option value="$PROJECT_DIR$/DZ4/bank/domain" />
+            <option value="$PROJECT_DIR$/DZ4/bank/infrastructure" />
+            <option value="$PROJECT_DIR$/DZ4/bank/infrastructure/CLITerminal" />
+            <option value="$PROJECT_DIR$/DZ4/bank/infrastructure/StubbedBank" />
           </set>
         </option>
       </GradleProjectSettings>
