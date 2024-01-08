@@ -6,4 +6,3 @@ include 'DZ4:bank:domain'
 include 'DZ4:bank:infrastructure:StubbedBank'
 include 'DZ4:bank:infrastructure:CLITerminal'
 include 'DZ4:urlReader'
-

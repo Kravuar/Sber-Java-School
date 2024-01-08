@@ -28,7 +28,7 @@ public interface BalanceService {
      * @throws IllegalArgumentException if the amount is not greater than 0.
      * @throws AuthenticationFailedException if the service fails to authenticate the operation.
      */
-    double deposit(String accessToken, double amount) throws IllegalArgumentException, AuthenticationFailedException;
+    double deposit(String accessToken, double amount) throws AuthenticationFailedException;
 
     /**
      * Withdraws the specified amount from the account associated with the provided access token.
@@ -40,5 +40,5 @@ public interface BalanceService {
      * @throws InsufficientFundsException if the account does not have sufficient funds.
      * @throws AuthenticationFailedException if the service fails to authenticate the operation.
      */
-    double withdraw(String accessToken, double amount) throws IllegalArgumentException, InsufficientFundsException, AuthenticationFailedException;
+    double withdraw(String accessToken, double amount) throws InsufficientFundsException, AuthenticationFailedException;
 }
