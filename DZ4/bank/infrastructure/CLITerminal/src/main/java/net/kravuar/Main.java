@@ -6,12 +6,14 @@ import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
 import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
+import net.kravuar.terminal.domain.exceptions.terminal.InvalidPinFormatException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 import net.kravuar.terminal.spi.BalanceService;
 import net.kravuar.terminal.spi.PinValidator;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -159,7 +161,7 @@ public class Main {
 
         if (terminal.isLocked(cardDetails)) {
             System.out.println("Account is locked. Cannot proceed.");
-            System.out.println("It will be locked for: " + terminal.getLockedDuration(cardDetails));
+            System.out.println("It will be locked for: " + Duration.between(LocalDateTime.now(), terminal.getUnlockTime(cardDetails)));
             return;
         }
 
@@ -189,7 +191,7 @@ public class Main {
                 System.out.println("Session started successfully.");
             else
                 System.out.println("Session wasn't started. Incorrect pin.");
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidPinFormatException e) {
             System.out.println("PIN in invalid format.");
         } catch (AccountIsLockedException e) {
             System.out.println("Account is locked. Cannot start session.");
@@ -243,7 +245,7 @@ public class Main {
         var cardDetails = new CardDetails(id);
 
         try {
-            var lockedDuration = terminal.getLockedDuration(cardDetails);
+            var lockedDuration = terminal.getUnlockTime(cardDetails);
             System.out.println("Account will be locked for: " + lockedDuration);
         } catch (IllegalStateException e) {
             System.out.println("Account isn't locked.");

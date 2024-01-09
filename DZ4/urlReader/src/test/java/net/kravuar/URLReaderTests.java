@@ -15,19 +15,21 @@ class URLReaderTests {
 
     @Test
     void readContentFailsWithIncorrectURL() {
-        try {
-            Main.readContent("bebebe");
-        } catch (URLReadingException e) {
-            assertInstanceOf(IllegalArgumentException.class, e.getCause(), "Expected to fail due to IllegalArgumentException");
-        }
+        var exception = assertThrows(URLReadingException.class, () -> Main.readContent("bebebe"));
+        assertInstanceOf(
+                IllegalArgumentException.class,
+                exception.getCause(),
+                "Expected to fail due to IllegalArgumentException"
+        );
     }
 
     @Test
     void readContentFailsWithUnrecognizedProtocol() {
-        try {
-            Main.readContent("bebe:/bebebe");
-        } catch (URLReadingException e) {
-            assertInstanceOf(MalformedURLException.class, e.getCause(), "Expected to fail due to MalformedURLException.");
-        }
+        var exception = assertThrows(URLReadingException.class, () -> Main.readContent("bebe:/bebebe"));
+        assertInstanceOf(
+                MalformedURLException.class,
+                exception.getCause(),
+                "Expected to fail due to MalformedURLException."
+        );
     }
 }

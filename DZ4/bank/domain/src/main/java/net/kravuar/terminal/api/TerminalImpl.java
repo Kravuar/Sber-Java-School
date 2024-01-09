@@ -5,6 +5,7 @@ import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.AuthenticationFailedException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
+import net.kravuar.terminal.domain.exceptions.terminal.InvalidPinFormatException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
@@ -93,9 +94,9 @@ public class TerminalImpl implements Terminal {
     }
 
     @Override
-    public boolean startSession(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException {
+    public boolean startSession(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException, InvalidPinFormatException {
         if (isLocked(cardDetails))
-            throw new AccountIsLockedException(getLockedDuration());
+            throw new AccountIsLockedException(getUnlockTime(cardDetails));
 
         var accessToken = pinValidator.authenticate(cardDetails, pin);
         if (accessToken.isEmpty()) {
@@ -145,16 +146,7 @@ public class TerminalImpl implements Terminal {
     }
 
     @Override
-    public Duration getLockedDuration() {
-        if (hasActiveSession()) {
-            var cardDetails = activeSession.cardDetails();
-            return getLockedDuration(cardDetails);
-        }
-        throw new NoEstablishedSessionException();
-    }
-
-    @Override
-    public Duration getLockedDuration(CardDetails cardDetails) {
+    public LocalDateTime getUnlockTime(CardDetails cardDetails) {
         return lockStorage.getLockDuration(cardDetails);
     }
 }

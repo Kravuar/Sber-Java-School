@@ -73,11 +73,11 @@ public class LockStorage {
      * @return {@code Duration} Remaining duration of the lock.
      * @throws IllegalStateException if card details aren't locked.
      */
-    public Duration getLockDuration(CardDetails cardDetails) {
+    public LocalDateTime getLockDuration(CardDetails cardDetails) {
         LockInfo entry = entries.get(cardDetails);
         if (entry == null || !entry.isLocked())
             throw new IllegalStateException("Account isn't locked.");
-        return Duration.between(LocalDateTime.now(), entry.unlockTime);
+        return entry.unlockTime;
     }
 
     /**
@@ -111,8 +111,8 @@ public class LockStorage {
 
         var newTask = scheduler.schedule(
                 () -> remove(cardDetails),
-                duration.getSeconds(),
-                TimeUnit.SECONDS
+                duration.toMillis(),
+                TimeUnit.MILLISECONDS
         );
 
         expirationTasks.put(cardDetails, newTask);

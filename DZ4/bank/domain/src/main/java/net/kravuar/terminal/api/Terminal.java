@@ -4,10 +4,12 @@ import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
 import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
+import net.kravuar.terminal.domain.exceptions.terminal.InvalidPinFormatException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 /**
  * The {@code Terminal} interface represents a terminal device with session management.
@@ -55,11 +57,11 @@ public interface Terminal {
      * @param cardDetails card info.
      * @param pin The PIN entered by the user.
      * @return {@code boolean} indicating whether PIN was correct (session started).
-     * @throws IllegalArgumentException if the PIN is not in valid format.
+     * @throws InvalidPinFormatException if the PIN is not in valid format.
      * @throws InvalidCardDetailsException if the provided CardDetails are invalid.
      * @throws AccountIsLockedException if account is locked.
      */
-    boolean startSession(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException;
+    boolean startSession(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException, InvalidPinFormatException;
 
     /**
      * Ends the session ahead of schedule.
@@ -102,19 +104,10 @@ public interface Terminal {
     boolean isLocked(CardDetails cardDetails);
 
     /**
-     * Retrieve current session's account lock duration.
+     * Retrieve unlock time of account associated with provided {@code CardDetails}.
      *
-     * @return {@code Duration} representing time after which account will be unlocked.
-     * @throws IllegalStateException if account isn't locked.
-     * @throws NoEstablishedSessionException if there wasn't active session.
-     */
-    Duration getLockedDuration();
-
-    /**
-     * Retrieve lock duration of account associated with provided {@code CardDetails}.
-     *
-     * @return {@code Duration} representing time after which account will be unlocked.
+     * @return {@code LocalDateTime} representing time at which account will be unlocked.
      * @throws IllegalStateException if account isn't locked.
      */
-    Duration getLockedDuration(CardDetails cardDetails);
+    LocalDateTime getUnlockTime(CardDetails cardDetails);
 }
