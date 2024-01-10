@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * The {@code Terminal} interface represents a terminal device with session management.
  * Users of this interface are obligated to check the session validity before invoking session-dependent methods.
- * Otherwise {@code InvalidSessionException} or {@code NoEstablishedSessionException} could be thrown.
+ * Otherwise {@link InvalidSessionException} or {@link NoEstablishedSessionException} could be thrown.
  */
 public interface Terminal {
     /**
@@ -99,12 +99,12 @@ public interface Terminal {
     Duration getSessionDuration();
 
     /**
-     * Check whether account associated with provided {@code CardDetails} is locked.
+     * Check whether account associated with provided {@link CardDetails} is locked.
      */
     boolean isLocked(CardDetails cardDetails);
 
     /**
-     * Retrieve unlock time of account associated with provided {@code CardDetails}.
+     * Retrieve unlock time of account associated with provided {@link CardDetails}.
      *
      * @return {@code LocalDateTime} representing time at which account will be unlocked.
      * @throws IllegalStateException if account isn't locked.

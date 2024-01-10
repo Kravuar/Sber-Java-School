@@ -13,7 +13,7 @@ public class InvalidCardDetailsException extends Exception {
     /**
      * Constructs an InvalidCardDetailsException with the specified card details.
      *
-     * @param cardDetails The {@code CardDetails} which caused the exception.
+     * @param cardDetails The {@link CardDetails} which caused the exception.
      */
     public InvalidCardDetailsException(CardDetails cardDetails) {
         super("No account with provided Card Details.");
@@ -23,7 +23,7 @@ public class InvalidCardDetailsException extends Exception {
     /**
      * Constructs an InvalidCardDetailsException with the specified card details and causing exception.
      *
-     * @param cardDetails The {@code CardDetails} which caused the exception.
+     * @param cardDetails The {@link CardDetails} which caused the exception.
      * @param cause Causing exception.
      */
     public InvalidCardDetailsException(CardDetails cardDetails, Throwable cause) {

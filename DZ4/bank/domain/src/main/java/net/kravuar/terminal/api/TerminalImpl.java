@@ -32,7 +32,7 @@ public class TerminalImpl implements Terminal {
 
 
     /**
-     * Constructs a {@code TerminalImpl} with the specified {@code BalanceService}, {@code PinValidator}, {@code sessionDuration}, {@code attemptsBeforeLock}, {@code lockDuration}, {@code attemptsResetDuration}.
+     * Constructs a {@code TerminalImpl} with the specified {@link BalanceService}, {@link PinValidator}, {@code sessionDuration}, {@code attemptsBeforeLock}, {@code lockDuration}, {@code attemptsResetDuration}.
      *
      * @throws IllegalArgumentException if provided session duration is not positive.
      */

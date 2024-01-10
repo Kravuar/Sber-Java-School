@@ -12,7 +12,7 @@ public class AccountIsLockedException extends RuntimeException {
     private final LocalDateTime unlockTime;
 
     /**
-     * Constructs a {@code AccountIsLockedException} with the specified unlock time.
+     * Constructs an {@code AccountIsLockedException} with the specified unlock time.
      *
      * @param unlockTime the time representing the time at which the account becomes available.
      */

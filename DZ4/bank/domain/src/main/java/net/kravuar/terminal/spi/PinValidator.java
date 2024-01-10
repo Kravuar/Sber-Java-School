@@ -19,7 +19,7 @@ public interface PinValidator {
      * @return accessToken containing {some stuff (like some of the card details, terminal info...)}
      *         to be used in subsequent requests to other bank services. Returns {@code Optional.empty()} if pin is incorrect.
      * @throws InvalidPinFormatException if the PIN is not in valid format.
-     * @throws InvalidCardDetailsException if the provided {@code CardDetails} are invalid.
+     * @throws InvalidCardDetailsException if the provided {@link CardDetails} are invalid.
      */
     Optional<String> authenticate(CardDetails cardDetails, char[] pin) throws InvalidCardDetailsException, InvalidPinFormatException;
 }

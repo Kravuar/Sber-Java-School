@@ -24,7 +24,7 @@ public class LockStorage {
     private final Duration resetAfterIdleDuration;
 
     /**
-     * Increments lock fail attempts for specified {@code CardDetails}.
+     * Increments lock fail attempts for specified {@link CardDetails}.
      * Creates a new lock entry if one does not exist for the specified card details.
      *
      * @param cardDetails The card details to associate with the fail attempts.
@@ -67,7 +67,7 @@ public class LockStorage {
     }
 
     /**
-     * Retrieves lock duration for specified {@code CardDetails}.
+     * Retrieves lock duration for specified {@link CardDetails}.
      *
      * @param cardDetails The card details of the account to check.
      * @return {@code Duration} Remaining duration of the lock.

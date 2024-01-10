@@ -18,13 +18,13 @@ public interface AccountService {
      * Retrieves account information along with the balance using the provided access token.
      *
      * @param accessToken The access token used to fetch account information.
-     * @return An instance of {@code AccountInfoWithBalance} containing account details and balance.
+     * @return An instance of {@link AccountInfoWithBalance} containing account details and balance.
      * @throws InvalidAccessTokenException If the provided access token is invalid.
      */
     AccountInfoWithBalance getAccountInfo(String accessToken) throws InvalidAccessTokenException;
 
     /**
-     * Converts {@code CardDetails} instance to string representation.
+     * Converts {@link CardDetails} instance to string representation.
      *
      * @param cardDetails card details which will be converted to access token.
      * @return {@code String} representing card details
@@ -33,10 +33,10 @@ public interface AccountService {
     String toToken(CardDetails cardDetails);
 
     /**
-     * Parses access token and constructs {@code CardDetails} from it.
+     * Parses access token and constructs {@link CardDetails} from it.
      *
      * @param accessToken string representation of an access token.
-     * @return {@code CardDetails} parsed from provided token
+     * @return {@link CardDetails} parsed from provided token
      * @throws InvalidAccessTokenException If the provided access token is invalid.
      * @throws AccountNotFoundException If the account associated with the card details is not found.
      */
