@@ -9,10 +9,10 @@ import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionExcep
 import net.kravuar.terminal.spi.BalanceService;
 import net.kravuar.terminal.spi.PinValidator;
 import org.awaitility.Awaitility;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -22,31 +22,26 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class TerminalTests {
+    @Mock
     BalanceService balanceService;
+    @Mock
     PinValidator pinValidator;
-
-    Terminal terminal;
 
     int attemptsBeforeLock = 2;
     Duration lockDuration = Duration.ofMillis(500);
     Duration attemptsResetDuration = Duration.ofMillis(500);
     Duration sessionDuration = Duration.ofSeconds(30);
 
-    @BeforeAll
-    void setUp() {
-        balanceService = Mockito.mock(BalanceService.class);
-        pinValidator = Mockito.mock(PinValidator.class);
-        terminal = new TerminalImpl(
-                balanceService,
-                pinValidator,
-                attemptsBeforeLock,
-                lockDuration,
-                attemptsResetDuration,
-                sessionDuration
-        );
-    }
+    Terminal terminal = new TerminalImpl(
+            balanceService,
+            pinValidator,
+            attemptsBeforeLock,
+            lockDuration,
+            attemptsResetDuration,
+            sessionDuration
+    );
 
     @Test
     void everythingThatRequiresSessionThrowsNoEstablishedSessionException() {

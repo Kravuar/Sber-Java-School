@@ -4,28 +4,20 @@ import net.kravuar.components.subjects.assign.GetterGuy;
 import net.kravuar.components.subjects.assign.GoodSetterGuy;
 import net.kravuar.components.subjects.assign.SetterGuyWithIncompatibleProperty;
 import net.kravuar.components.subjects.reflection.HierarchyBottom;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BeanUtilsTests {
-    GetterGuy getterGuy;
-
-    @BeforeAll
-    void init() {
-        getterGuy = new GetterGuy(
-                5,
-                new ArrayList<Integer>(),
-                "baba",
-                new HierarchyBottom(),
-                true
-        );
-    }
+    GetterGuy getterGuy = new GetterGuy(
+            5,
+            new ArrayList<Integer>(),
+            "baba",
+            new HierarchyBottom(),
+            true
+    );
 
     @Test
     void assignWorksFine() {

@@ -1,20 +1,12 @@
 package net.kravuar.components.subjects.calculator;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CalculatorTests {
-    Calculator calculator;
-
-    @BeforeAll
-    void init() {
-        this.calculator = new CalculatorImpl();
-    }
+    Calculator calculator = new CalculatorImpl();
 
     @Test
     void factorialIsCorrect() {
