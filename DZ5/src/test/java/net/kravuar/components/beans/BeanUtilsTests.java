@@ -22,7 +22,8 @@ class BeanUtilsTests {
                 5,
                 new ArrayList<Integer>(),
                 "baba",
-                new HierarchyBottom()
+                new HierarchyBottom(),
+                true
         );
     }
 
@@ -36,6 +37,7 @@ class BeanUtilsTests {
         assertEquals(getterGuy.getBebe(), setterGuy.getBebe());
         assertEquals(getterGuy.getBobo(), setterGuy.getBobo());
         assertEquals(getterGuy.getByby(), setterGuy.getByby());
+        assertEquals(getterGuy.isOk(), setterGuy.isOk());
     }
 
     @Test

@@ -31,7 +31,7 @@ public class ReflectionUtils {
      */
     public static void printAllGetters(Class<?> clazz) {
         getAllMethods(clazz)
-                .filter(method -> method.getName().toLowerCase().startsWith("get"))
+                .filter(method -> method.getName().toLowerCase().startsWith("get") || method.getName().toLowerCase().startsWith("is"))
                 .forEach((method) -> System.out.format(
                         "Getter Method: %s%n",
                         method.toGenericString()

@@ -11,4 +11,5 @@ public class SetterGuyWithIncompatibleProperty {
     private Object bobo;
     private String baba;
     private HierarchyBottom byby; // This one
+    // no ok field
 }

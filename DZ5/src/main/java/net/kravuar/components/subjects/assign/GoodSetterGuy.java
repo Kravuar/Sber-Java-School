@@ -11,4 +11,5 @@ public class GoodSetterGuy {
     private Object bobo;
     private String baba;
     private HierarchyMid byby;
+    private boolean ok;
 }

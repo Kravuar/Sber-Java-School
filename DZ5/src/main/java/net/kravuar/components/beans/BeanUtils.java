@@ -30,10 +30,12 @@ public class BeanUtils {
                         Function.identity()
                 ));
         Arrays.stream(from.getClass().getMethods())
-                .filter(method -> method.getName().startsWith("get"))
+                .filter(method -> method.getName().startsWith("get") || method.getName().toLowerCase().startsWith("is"))
                 .forEach(getter -> {
                     var getterType = getter.getReturnType();
-                    var propertyName = getter.getName().replace("get", "");
+                    var propertyName = getter.getName().startsWith("get")
+                            ? getter.getName().replace("get", "")
+                            : getter.getName().replace("is", "");
 
                     var setter = toSetters.get(propertyName);
                     if (setter == null)
