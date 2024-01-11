@@ -1,4 +1,4 @@
-package net.kravuar.components.reflection;
+package net.kravuar.components.subjects.reflection;
 
 public class HierarchyMid implements HierarchyTop {
     String middleMethod() {

@@ -1,5 +1,8 @@
 package net.kravuar.components.cache;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class CachedInvocationHandler implements InvocationHandler {
+    private final Logger log = LogManager.getLogger(CachedInvocationHandler.class);
     private final Map<Map<Parameter, Object>, Object> resultByArg = new HashMap<>();
     private final Object target;
 
@@ -25,8 +29,7 @@ public class CachedInvocationHandler implements InvocationHandler {
 
         var key = getKey(method, args);
         if (!resultByArg.containsKey(key)) {
-            System.out.format(
-                    "Cache miss on method %s with args %s.%n",
+            log.info("Cache miss on method {} with args {}.",
                     method.getName(),
                     Arrays.toString(args)
             );
@@ -34,8 +37,7 @@ public class CachedInvocationHandler implements InvocationHandler {
             resultByArg.put(key, invoke);
         }
         else
-            System.out.format(
-                    "Cache hit on method %s with args %s.%n",
+            log.info("Cache hit on method {} with args {}.",
                     method.getName(),
                     Arrays.toString(args)
             );

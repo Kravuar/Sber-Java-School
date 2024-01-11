@@ -1,7 +1,5 @@
-package net.kravuar.components.reflection;
+package net.kravuar.components.subjects.calculator;
 
-import net.kravuar.components.calculator.Calculator;
-import net.kravuar.components.calculator.CalculatorImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -20,14 +18,10 @@ public class CalculatorTests {
 
     @Test
     void factorialIsCorrect() {
+        assertEquals(calculator.factorial(0), 1);
         assertEquals(calculator.factorial(3), 6);
         assertEquals(calculator.factorial(4), 24);
         assertEquals(calculator.factorial(7), 5040);
-    }
-
-    @Test
-    void factorialOfZeroIsOne() {
-        assertEquals(calculator.factorial(0), 1);
     }
 
     @Test

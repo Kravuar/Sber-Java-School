@@ -1,4 +1,4 @@
-package net.kravuar.components.reflection;
+package net.kravuar.components.subjects.reflection;
 
 public class HierarchyBottom extends HierarchyMid {
     String bottomMethod() {

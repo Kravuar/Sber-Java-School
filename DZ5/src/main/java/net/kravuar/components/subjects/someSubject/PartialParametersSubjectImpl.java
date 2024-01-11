@@ -1,4 +1,4 @@
-package net.kravuar.components.cache;
+package net.kravuar.components.subjects.someSubject;
 
 public class PartialParametersSubjectImpl implements PartialParametersSubject {
     @Override

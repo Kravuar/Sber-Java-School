@@ -1,4 +1,4 @@
-package net.kravuar.components.calculator;
+package net.kravuar.components.subjects.calculator;
 
 public class CalculatorImpl implements Calculator {
 

@@ -1,4 +1,6 @@
-package net.kravuar.components.cache;
+package net.kravuar.components.subjects.someSubject;
+
+import net.kravuar.components.cache.Cache;
 
 public interface PartialParametersSubject {
 

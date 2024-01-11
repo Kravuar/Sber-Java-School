@@ -1,5 +1,6 @@
 package net.kravuar.components.reflection;
 
+import net.kravuar.components.subjects.reflection.StringEnum;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -10,13 +11,7 @@ class ReflectionUtilsTests {
 
     @Test
     void validateStringEnumPatternWorks() throws NoSuchFieldException {
-        var clazz = new Object() {
-            private static final String BEBE = "BEBE";
-            public static final String BABA = "BABA";
-            
-            private static final String notBOBO = "BOBO";
-            public static final String definitelyNotBIBI = "BIBI";
-        }.getClass();
+        var clazz = StringEnum.class;
 
         var invalidExpected = Set.of(
                 clazz.getDeclaredField("notBOBO"),
