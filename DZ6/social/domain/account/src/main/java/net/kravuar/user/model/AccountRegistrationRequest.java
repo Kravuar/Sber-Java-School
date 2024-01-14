@@ -1,7 +1,7 @@
 package net.kravuar.user.model;
 
 
-public record AccountCreationRequest(
+public record AccountRegistrationRequest(
     String firstName,
     String secondName,
     String username,

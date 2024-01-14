@@ -1,9 +1,9 @@
 package net.kravuar.friends.ports.in;
 
 import net.kravuar.friends.model.Friendship;
+import net.kravuar.friends.model.exceptions.AccountNotFoundException;
 import net.kravuar.friends.model.exceptions.FriendshipNotFoundException;
 import net.kravuar.friends.model.exceptions.FriendshipRequestAlreadySentException;
-import net.kravuar.user.model.exceptions.AccountNotFoundException;
 
 public interface FriendshipManagementUseCase {
 

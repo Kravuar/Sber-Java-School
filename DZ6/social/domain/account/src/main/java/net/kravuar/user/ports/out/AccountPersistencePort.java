@@ -4,5 +4,4 @@ import net.kravuar.user.model.Account;
 
 public interface AccountPersistencePort {
     Account save(Account account);
-    void delete(long userId);
 }

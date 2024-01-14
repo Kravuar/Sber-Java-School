@@ -18,11 +18,6 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>net.kravuar.domain</groupId>
-            <artifactId>account</artifactId>
-            <version>1.0</version>
-        </dependency>
     </dependencies>
 
     <build>

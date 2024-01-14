@@ -2,27 +2,27 @@ package net.kravuar.friends.services;
 
 import lombok.RequiredArgsConstructor;
 import net.kravuar.friends.model.Friendship;
+import net.kravuar.friends.model.exceptions.AccountNotFoundException;
 import net.kravuar.friends.model.exceptions.FriendshipNotFoundException;
 import net.kravuar.friends.model.exceptions.FriendshipRequestAlreadySentException;
 import net.kravuar.friends.ports.in.FriendshipManagementUseCase;
+import net.kravuar.friends.ports.out.AccountExistenceCheckPort;
 import net.kravuar.friends.ports.out.FriendshipManagementPort;
 import net.kravuar.friends.ports.out.FriendshipRetrievalPort;
-import net.kravuar.user.model.exceptions.AccountNotFoundException;
-import net.kravuar.user.ports.out.AccountRetrievalPort;
 
 @RequiredArgsConstructor
 public class FriendshipManagementService implements FriendshipManagementUseCase {
     private final FriendshipRetrievalPort friendshipRetrievalPort;
     private final FriendshipManagementPort friendshipManagementPort;
-    private final AccountRetrievalPort accountRetrievalPort;
+    private final AccountExistenceCheckPort accountExistenceCheckPort;
 
     @Override
     public Friendship sendFriendRequest(long fromUserId, long toUserId) {
         if (friendshipRetrievalPort.findByParticipantIds(fromUserId, toUserId).isPresent())
             throw new FriendshipRequestAlreadySentException(fromUserId, toUserId);
 
-        validateAccountOrThrow(fromUserId);
-        validateAccountOrThrow(toUserId);
+        checkIfExistsOrElseThrow(fromUserId);
+        checkIfExistsOrElseThrow(toUserId);
 
         Friendship friendship = new Friendship(
                 fromUserId,
@@ -79,8 +79,8 @@ public class FriendshipManagementService implements FriendshipManagementUseCase 
         friendshipManagementPort.save(friendship);
     }
 
-    private void validateAccountOrThrow(long id) {
-        if (accountRetrievalPort.findById(id).isEmpty())
-            throw new AccountNotFoundException(id);
+    private void checkIfExistsOrElseThrow(long userId) {
+        if (accountExistenceCheckPort.exists(userId))
+            throw new AccountNotFoundException(userId);
     }
 }
