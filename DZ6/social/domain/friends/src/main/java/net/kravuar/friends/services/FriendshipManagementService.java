@@ -7,13 +7,13 @@ import net.kravuar.friends.model.exceptions.FriendshipNotFoundException;
 import net.kravuar.friends.model.exceptions.FriendshipRequestAlreadySentException;
 import net.kravuar.friends.ports.in.FriendshipManagementUseCase;
 import net.kravuar.friends.ports.out.AccountExistenceCheckPort;
-import net.kravuar.friends.ports.out.FriendshipManagementPort;
+import net.kravuar.friends.ports.out.FriendshipPersistencePort;
 import net.kravuar.friends.ports.out.FriendshipRetrievalPort;
 
 @RequiredArgsConstructor
 public class FriendshipManagementService implements FriendshipManagementUseCase {
     private final FriendshipRetrievalPort friendshipRetrievalPort;
-    private final FriendshipManagementPort friendshipManagementPort;
+    private final FriendshipPersistencePort friendshipPersistencePort;
     private final AccountExistenceCheckPort accountExistenceCheckPort;
 
     @Override
@@ -21,15 +21,17 @@ public class FriendshipManagementService implements FriendshipManagementUseCase 
         if (friendshipRetrievalPort.findByParticipantIds(fromUserId, toUserId).isPresent())
             throw new FriendshipRequestAlreadySentException(fromUserId, toUserId);
 
-        checkIfExistsOrElseThrow(fromUserId);
-        checkIfExistsOrElseThrow(toUserId);
+        if (accountExistenceCheckPort.exists(fromUserId))
+            throw new AccountNotFoundException(fromUserId);
+        if (accountExistenceCheckPort.exists(toUserId))
+            throw new AccountNotFoundException(toUserId);
 
         Friendship friendship = new Friendship(
                 fromUserId,
                 toUserId,
                 Friendship.FriendshipStatus.PENDING
         );
-        return friendshipManagementPort.save(friendship);
+        return friendshipPersistencePort.save(friendship);
     }
 
     @Override
@@ -42,7 +44,7 @@ public class FriendshipManagementService implements FriendshipManagementUseCase 
             throw new IllegalStateException("Friendship should be in a PENDING status.");
 
         friendship.setStatus(Friendship.FriendshipStatus.ACCEPTED);
-        friendshipManagementPort.save(friendship);
+        friendshipPersistencePort.save(friendship);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class FriendshipManagementService implements FriendshipManagementUseCase 
         if (friendship.getStatus() != Friendship.FriendshipStatus.PENDING)
             throw new IllegalStateException("Friendship should be in a PENDING status.");
 
-        friendshipManagementPort.delete(friendship);
+        friendshipPersistencePort.delete(friendship);
     }
 
     @Override
@@ -66,7 +68,7 @@ public class FriendshipManagementService implements FriendshipManagementUseCase 
         if (friendship.getStatus() != Friendship.FriendshipStatus.ACCEPTED)
             throw new IllegalStateException("Friendship should be in a ACCEPTED status.");
 
-        friendshipManagementPort.delete(friendship);
+        friendshipPersistencePort.delete(friendship);
     }
 
     @Override
@@ -76,11 +78,6 @@ public class FriendshipManagementService implements FriendshipManagementUseCase 
                 .orElseThrow(() -> new FriendshipNotFoundException(fromUserId, blockedUserId));
 
         friendship.setStatus(Friendship.FriendshipStatus.BLOCKED);
-        friendshipManagementPort.save(friendship);
-    }
-
-    private void checkIfExistsOrElseThrow(long userId) {
-        if (accountExistenceCheckPort.exists(userId))
-            throw new AccountNotFoundException(userId);
+        friendshipPersistencePort.save(friendship);
     }
 }

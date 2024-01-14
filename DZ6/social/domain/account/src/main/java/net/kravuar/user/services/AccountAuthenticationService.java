@@ -6,7 +6,7 @@ import net.kravuar.user.model.AccountAuthenticationRequest;
 import net.kravuar.user.model.AccountRegistrationRequest;
 import net.kravuar.user.model.exceptions.AccountExistsException;
 import net.kravuar.user.model.exceptions.AccountNotFoundException;
-import net.kravuar.user.model.exceptions.AuthenticationException;
+import net.kravuar.user.model.exceptions.IncorrectPasswordException;
 import net.kravuar.user.ports.in.AccountAuthenticationUseCase;
 import net.kravuar.user.ports.out.AccountPersistencePort;
 import net.kravuar.user.ports.out.AccountRetrievalPort;
@@ -24,7 +24,7 @@ public class AccountAuthenticationService implements AccountAuthenticationUseCas
                 .orElseThrow(() -> new AccountNotFoundException(request.username()));
 
         if (!passwordEncoderPort.encode(request.password()).equals(account.getPasswordEncoded()))
-            throw new AuthenticationException(request);
+            throw new IncorrectPasswordException(request);
 
         return account;
     }
