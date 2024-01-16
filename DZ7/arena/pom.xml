@@ -16,6 +16,8 @@
             <groupId>net.kravuar</groupId>
             <artifactId>plugin-api</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <!-- We'll load it manually it the common classloader. -->
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

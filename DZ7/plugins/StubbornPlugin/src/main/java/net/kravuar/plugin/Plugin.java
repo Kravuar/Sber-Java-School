@@ -6,4 +6,9 @@ public class Plugin implements RockPaperScissorsPlugin {
     public Option act() {
         return Option.PAPER;
     }
+
+    @Override
+    public String getName() {
+        return "Stubborn";
+    }
 }

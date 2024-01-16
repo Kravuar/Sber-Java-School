@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public interface RockPaperScissorsPlugin {
+    Option act();
+    String getName();
+
     enum Option {
         ROCK,
         PAPER,
@@ -33,17 +36,15 @@ public interface RockPaperScissorsPlugin {
                 this.combinations = combinations;
             }
 
-            public static Outcome getOutcome(Option firstOpponentOption, Option secondOpponentOption) {
+            public static Outcome getOutcome(Option firstParticipantOption, Option secondParticipantOption) {
                 return Stream.of(values())
-                        .filter(outcome -> outcome.isOutcome(firstOpponentOption, secondOpponentOption))
+                        .filter(outcome -> outcome.isOutcome(firstParticipantOption, secondParticipantOption))
                         .findFirst().orElseThrow();
             }
 
-            private boolean isOutcome(Option firstOpponentOption, Option secondOpponentOption) {
-                return combinations.get(firstOpponentOption).equals(secondOpponentOption);
+            private boolean isOutcome(Option firstParticipantOption, Option secondParticipantOption) {
+                return combinations.get(firstParticipantOption).equals(secondParticipantOption);
             }
         }
     }
-
-    Option act();
 }

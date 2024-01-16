@@ -45,7 +45,8 @@ public class PluginIterator implements Iterator<RockPaperScissorsPlugin> {
 
             try {
                 var jarURL = nextJar.toURI().toURL();
-                try (var classLoader = new URLClassLoader(new URL[]{jarURL})) {
+                var parentLoader = getClass().getClassLoader().getParent();
+                try (var classLoader = new URLClassLoader(new URL[]{jarURL}, parentLoader)) {
                     var pluginClass = classLoader.loadClass("net.kravuar.plugin.Plugin");
                     this.nextPlugin = (RockPaperScissorsPlugin) pluginClass.getDeclaredConstructor().newInstance();
                 } catch (IOException e) {

@@ -11,4 +11,9 @@ public class Plugin implements RockPaperScissorsPlugin {
         list.addLast(next);
         return next;
     }
+
+    @Override
+    public String getName() {
+        return "Consecutive";
+    }
 }

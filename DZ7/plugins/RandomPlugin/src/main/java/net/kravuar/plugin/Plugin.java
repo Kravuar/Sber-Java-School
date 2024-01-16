@@ -10,4 +10,9 @@ public class Plugin implements RockPaperScissorsPlugin {
     public Option act() {
         return options[random.nextInt(options.length)];
     }
+
+    @Override
+    public String getName() {
+        return "Random";
+    }
 }

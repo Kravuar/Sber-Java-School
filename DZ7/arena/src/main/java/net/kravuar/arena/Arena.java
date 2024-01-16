@@ -8,7 +8,7 @@ import java.util.Optional;
 public class Arena {
     private final int roundsPerBattle;
     private final PluginIterator pluginIterator;
-    private RockPaperScissorsPlugin firstOpponent;
+    private RockPaperScissorsPlugin firstParticipant;
 
     public Arena(Path pluginsDirPath, int roundsPerBattle) {
         if (roundsPerBattle % 2 != 1)
@@ -18,35 +18,66 @@ public class Arena {
         this.roundsPerBattle = roundsPerBattle;
         if (!pluginIterator.hasNext())
             throw new IllegalArgumentException("Directory doesn't contain any plugins.");
-        this.firstOpponent = pluginIterator.next();
+        this.firstParticipant = pluginIterator.next();
     }
 
     /**
-     * Proceeds rock-paper-scissors battle by loading new opponent
-     * and making it fight against previous winner (or the first opponent if the game just started)
+     * Proceeds rock-paper-scissors battle by loading new participant
+     * and making it fight against previous winner (or the first participant if the game just started)
      *
-     * @return {@code Optional} containing Arena winner or {@code Optional.empty()} if the Arena haven't finished yet.
+     * @return {@link BattleScore}.
+     * @throws IllegalStateException If the was no participants left.
      */
-    public Optional<RockPaperScissorsPlugin> proceedBattle() {
-        if (!pluginIterator.hasNext())
-            return Optional.of(firstOpponent);
+    public BattleScore proceedBattle() {
+        if (hasWinner())
+            throw new IllegalStateException("No participants left.");
 
-        var secondOpponent = pluginIterator.next();
+        var secondParticipant = pluginIterator.next();
 
         int firstWinCount = 0;
         int secondWinCount = 0;
         for (int i = 0; i < roundsPerBattle; ++i) {
-            var firstOpponentOption = firstOpponent.act();
-            var secondOpponentOption = secondOpponent.act();
+            var firstParticipantOption = firstParticipant.act();
+            var secondParticipantOption = secondParticipant.act();
 
-            switch (RockPaperScissorsPlugin.Option.Outcome.getOutcome(firstOpponentOption, secondOpponentOption)) {
+            switch (RockPaperScissorsPlugin.Option.Outcome.getOutcome(firstParticipantOption, secondParticipantOption)) {
                 case WIN -> firstWinCount++;
                 case DEFEAT -> secondWinCount++;
-                case TIE -> {/*continue*/}
+                case TIE -> --i; /*continue*/
             }
         }
+
         if (firstWinCount < secondWinCount)
-            firstOpponent = secondOpponent;
-        return Optional.empty();
+            firstParticipant = secondParticipant;
+
+        return new BattleScore(
+                firstParticipant.getName(),
+                secondParticipant.getName(),
+                firstWinCount,
+                secondWinCount
+        );
     }
+
+    public boolean hasWinner() {
+        return !pluginIterator.hasNext();
+    }
+
+    /**
+     * Retrieves winner name.
+     *
+     * @return {@code String} Winner name.
+     * @throws IllegalStateException If the arena hasn't finished yet.
+     */
+    public String getWinnerName() {
+        if (!hasWinner())
+            throw new IllegalStateException("The arena hasn't finished yet.");
+        return firstParticipant.getName();
+    }
+
+    public record BattleScore(
+            String firstParticipantName,
+            String secondParticipantName,
+            int firstParticipantScore,
+            int secondParticipantScore
+    ) {}
 }
