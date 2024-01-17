@@ -16,6 +16,7 @@ import java.util.jar.JarFile;
 public class Main {
     // To run this - run mvn package for DZ7,
     // plugins (participants) directory will appear in plugins module.
+    // Works only from CLI. So java -jar...
     public static void main(String[] args) throws NoSuchMethodException, ClassNotFoundException, URISyntaxException {
         // Isolate core from common (plugins)
         var urls = loadFromJar();

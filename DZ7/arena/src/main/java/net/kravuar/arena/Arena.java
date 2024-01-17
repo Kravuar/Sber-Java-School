@@ -3,6 +3,8 @@ package net.kravuar.arena;
 import net.kravuar.plugin.RockPaperScissorsPlugin;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Arena {
     private final int roundsPerBattle;
@@ -33,11 +35,13 @@ public class Arena {
 
         var secondParticipant = pluginIterator.next();
 
+        List<RoundHistory> history = new ArrayList<>();
         int firstWinCount = 0;
         int secondWinCount = 0;
         for (int i = 0; i < roundsPerBattle; ++i) {
             var firstParticipantOption = firstParticipant.act();
             var secondParticipantOption = secondParticipant.act();
+            history.add(new RoundHistory(firstParticipantOption, secondParticipantOption));
 
             switch (RockPaperScissorsPlugin.Option.Outcome.getOutcome(firstParticipantOption, secondParticipantOption)) {
                 case WIN -> firstWinCount++;
@@ -50,7 +54,8 @@ public class Arena {
                 firstParticipant.getName(),
                 secondParticipant.getName(),
                 firstWinCount,
-                secondWinCount
+                secondWinCount,
+                history
         );
 
         if (firstWinCount < secondWinCount)
@@ -79,6 +84,12 @@ public class Arena {
             String firstParticipantName,
             String secondParticipantName,
             int firstParticipantScore,
-            int secondParticipantScore
+            int secondParticipantScore,
+            List<RoundHistory> history
+    ) {}
+
+    public record RoundHistory(
+            RockPaperScissorsPlugin.Option firstOpponentOption,
+            RockPaperScissorsPlugin.Option secondOpponentOption
     ) {}
 }
