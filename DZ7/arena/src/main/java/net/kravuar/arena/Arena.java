@@ -3,7 +3,6 @@ package net.kravuar.arena;
 import net.kravuar.plugin.RockPaperScissorsPlugin;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 public class Arena {
     private final int roundsPerBattle;
@@ -47,15 +46,17 @@ public class Arena {
             }
         }
 
-        if (firstWinCount < secondWinCount)
-            firstParticipant = secondParticipant;
-
-        return new BattleScore(
+        var battleScore = new BattleScore(
                 firstParticipant.getName(),
                 secondParticipant.getName(),
                 firstWinCount,
                 secondWinCount
         );
+
+        if (firstWinCount < secondWinCount)
+            firstParticipant = secondParticipant;
+
+        return battleScore;
     }
 
     public boolean hasWinner() {

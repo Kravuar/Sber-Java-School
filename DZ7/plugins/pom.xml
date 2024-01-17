@@ -11,6 +11,7 @@
 
     <groupId>net.kravuar.plugins</groupId>
     <artifactId>root</artifactId>
+    <name>root</name>
     <packaging>pom</packaging>
 
     <modules>
@@ -41,7 +42,7 @@
                     <version>${maven.jar.plugin.version}</version>
                     <executions>
                         <execution>
-                            <id>jar-to-plugins-dir</id>
+                            <id>${project.artifactId}-jar-to-plugins-dir</id>
                             <phase>package</phase>
                             <goals>
                                 <goal>jar</goal>
@@ -56,5 +57,21 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <!-- Exclude parent from being packaged -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>root-jar-to-plugins-dir</id>
+                        <phase>none</phase>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

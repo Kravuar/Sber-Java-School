@@ -11,25 +11,74 @@
 
     <artifactId>arena</artifactId>
 
+    <properties>
+        <plugin-api.version>1.0-SNAPSHOT</plugin-api.version>
+        <maven.dependency.version>3.6.1</maven.dependency.version>
+        <maven.assembly.version>3.6.0</maven.assembly.version>
+        <maven.shade.version>3.5.1</maven.shade.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>net.kravuar</groupId>
             <artifactId>plugin-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <!-- We'll load it manually it the common classloader. -->
-            <scope>provided</scope>
+            <version>${plugin-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apiguardian</groupId>
+            <artifactId>apiguardian-api</artifactId>
+            <version>1.1.2</version>
         </dependency>
     </dependencies>
 
-    <properties>
-        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
-    </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven.dependency.version}</version>
+                <executions>
+                    <!-- Common dependencies -->
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven.jar.plugin.version}</version>
+                <version>${maven.jar.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven.assembly.version}</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/resources/assembly-split-into-common-core.xml</descriptor>
+                            </descriptors>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <archive>
+                                <manifest>
+                                    <mainClass>net.kravuar.arena.Main</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

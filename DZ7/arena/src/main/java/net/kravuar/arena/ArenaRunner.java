@@ -13,13 +13,13 @@ public class ArenaRunner implements Runnable {
     public void run() {
         while (!arena.hasWinner()) {
             var battleScore = arena.proceedBattle();
-            System.out.printf("Battle Score: %n%s%d;%n%s%d.%n",
+            System.out.printf("Battle Score: {%s-%d; %s-%d}.%n",
                     battleScore.firstParticipantName(),
                     battleScore.firstParticipantScore(),
                     battleScore.secondParticipantName(),
                     battleScore.secondParticipantScore()
             );
         }
-        System.out.printf("Winner: %s", arena.getWinnerName());
+        System.out.printf("Winner: %s%n", arena.getWinnerName());
     }
 }

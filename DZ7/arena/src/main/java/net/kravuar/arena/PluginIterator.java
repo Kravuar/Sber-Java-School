@@ -21,12 +21,16 @@ public class PluginIterator implements Iterator<RockPaperScissorsPlugin> {
                         pluginDirectoryPath.toFile().listFiles(file -> file.isFile() && file.getName().endsWith(".jar"))
                 ))
         );
-        advance();
     }
 
     @Override
     public boolean hasNext() {
-        return nextPlugin != null;
+        if (nextPlugin == null) {
+            advance();
+            return nextPlugin != null;
+        }
+        else
+            return true;
     }
 
     @Override
@@ -40,25 +44,27 @@ public class PluginIterator implements Iterator<RockPaperScissorsPlugin> {
     }
 
     private void advance() {
+        this.nextPlugin = null;
         while (!jars.isEmpty()) {
             var nextJar = jars.pollFirst();
 
             try {
                 var jarURL = nextJar.toURI().toURL();
-                var parentLoader = getClass().getClassLoader().getParent();
-                try (var classLoader = new URLClassLoader(new URL[]{jarURL}, parentLoader)) {
+
+                var commonLoader = getClass().getClassLoader().getParent();
+                try (var classLoader = new URLClassLoader(new URL[]{jarURL}, commonLoader)) {
                     var pluginClass = classLoader.loadClass("net.kravuar.plugin.Plugin");
                     this.nextPlugin = (RockPaperScissorsPlugin) pluginClass.getDeclaredConstructor().newInstance();
+                    break;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException |
-                         InstantiationException | InvocationTargetException ignored) {
+                         InstantiationException | InvocationTargetException ignore) {
                     // Couldn't instantiate plugin (Plugin creator mistake). Skipping.
                 }
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
         }
-        this.nextPlugin = null;
     }
 }

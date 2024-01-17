@@ -1,49 +1,104 @@
 package net.kravuar.arena;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.*;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
+import java.util.jar.JarFile;
 
 public class Main {
-    // To launch this need to provide path to common lib directory (containing plugin-api.jar)
-    // path to plugins dir (containing plugins .jar's)
-    // roundsPerBattle int (> 1, odd)
-    public static void main(String[] args) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, MalformedURLException, URISyntaxException {
-        System.out.println(Arrays.toString(args));
-        if (args.length != 3)
-            throw new RuntimeException("Na-ah");
+    // To run this - run mvn package for DZ7,
+    // plugins (participants) directory will appear in plugins module.
+    public static void main(String[] args) throws NoSuchMethodException, ClassNotFoundException, URISyntaxException {
+        // Isolate core from common (plugins)
+        var urls = loadFromJar();
 
-        var commonURLs = toArrayOfURLs(args[0].split(";"));
-        var pluginsDir = new File(args[1]).toPath();
-        var roundsPerBattle = Integer.parseInt(args[2]);
-
-        URLClassLoader commonsLoader = new URLClassLoader(commonURLs, null);
-
-        URL[] classpath = toArrayOfURLs(System.getProperty("java.class.path").split(File.pathSeparator));
-        URLClassLoader appLoader = new URLClassLoader(classpath, commonsLoader);
+        URLClassLoader commonsLoader = new URLClassLoader("common", urls.common, null);
+        URLClassLoader appLoader = new URLClassLoader("core", urls.core, commonsLoader);
 
         // Load and invoke runner class from the core app
         Class<?> runnerClass = appLoader.loadClass("net.kravuar.arena.ArenaRunner");
         Constructor<?> runnerConstructor = runnerClass.getConstructor(Path.class, int.class);
-        Object runnerInstance = runnerConstructor.newInstance(pluginsDir, roundsPerBattle);
-        Method mainMethod = runnerClass.getMethod("run");
-        mainMethod.invoke(runnerInstance);
+
+        // Infinite loop
+        Scanner scanner = new Scanner(System.in);
+        boolean exit = false;
+
+        while (!exit) {
+            System.out.println("Options:");
+            System.out.println("1. Start Arena");
+            System.out.println("2. Exit program");
+            System.out.print("Enter your choice: ");
+
+            int choice;
+            try {
+                choice = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Incorrect Input. Try again.");
+                continue;
+            } finally {
+                scanner.nextLine();
+            }
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter path to plugins directory: ");
+                    Path pluginsDir;
+                    try {
+                        pluginsDir = Paths.get(scanner.nextLine());
+                    } catch (InvalidPathException ignored) {
+                        System.out.println("Path is incorrect.");
+                        continue;
+                    }
+
+                    System.out.print("Enter round per battle value: ");
+                    int roundsPerBattle = scanner.nextInt();
+                    scanner.nextLine();
+
+                    try {
+                        Runnable runnerInstance = (Runnable) runnerConstructor.newInstance(pluginsDir, roundsPerBattle);
+                        runnerInstance.run();
+                    } catch (Throwable e) {
+                        System.out.println("Couldn't start Arena: " + e.getMessage());
+                        continue;
+                    }
+                    break;
+                case 2:
+                    exit = true;
+                    System.out.println("Exiting program.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please enter 1 or 2.");
+            }
+        }
     }
 
-    private static URL[] toArrayOfURLs(String[] paths) {
-        return Arrays.stream(paths)
-                .map(File::new)
-                .map(uri -> {
-                    try {
-                        return uri.toURI().toURL(); // d_(-_-)
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toArray(URL[]::new);
+    private record URLs(URL[] common, URL[] core) {}
+
+    private static URLs loadFromJar() throws URISyntaxException {
+        File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+        try (var ignored = new JarFile(jarFile)) {
+            List<URL> commonUrls = new ArrayList<>();
+            List<URL> coreUrls = new ArrayList<>();
+
+            commonUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/lib/common/").toURL());
+            // Jar itself (with core and sources)
+            coreUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/").toURL());
+
+            return new URLs(
+                    commonUrls.toArray(URL[]::new),
+                    coreUrls.toArray(URL[]::new)
+            );
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
