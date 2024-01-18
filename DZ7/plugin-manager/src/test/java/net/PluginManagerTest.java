@@ -34,7 +34,7 @@ class PluginManagerTest {
     void regularManager_andParentIsCurrentClassloader_loadsPlugin_PluginHasSameJUnitVersion() {
         // given
         PluginManager<Supplier> reversedPluginManager = new PluginManager<>(
-                Paths.get("src", "test", "resources"),
+                Paths.get("src/test/resources"),
                 Supplier.class,
                 getClass().getClassLoader(),
                 false

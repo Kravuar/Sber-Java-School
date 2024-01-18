@@ -1,6 +1,8 @@
 package net.kravuar.plugin;
 
-import java.util.*;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Plugin implements RockPaperScissorsPlugin {
     private final Deque<Option> list = new LinkedList<>(List.of(Option.values()));

@@ -13,6 +13,7 @@
         <module>arena</module>
         <module>plugins</module>
         <module>plugin-manager</module>
+        <module>decoding-classloader</module>
     </modules>
 
     <properties>

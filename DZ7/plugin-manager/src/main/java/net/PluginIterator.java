@@ -1,6 +1,5 @@
 package net;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +25,7 @@ public class PluginIterator<E> implements Iterator<E> {
     private static final String MAIN_CLASS_PROPERTY_NAME = "main.class";
 
     private final Class<E> pluginInterface;
-    private final Deque<File> jars;
+    private final Deque<Path> jars;
     private final Function<URL[], URLClassLoader> classloaderProvider;
     private E nextPlugin;
 
@@ -43,8 +42,7 @@ public class PluginIterator<E> implements Iterator<E> {
         try (var files = Files.walk(pluginBaseDirectoryPath)) {
             this.jars = files
                     .filter(Files::isRegularFile)
-                    .filter(file -> file.toString().endsWith(".jar"))
-                    .map(Path::toFile)
+                    .filter(path -> path.toString().endsWith(".jar"))
                     .collect(Collectors.toCollection(LinkedList::new));
         }
         this.pluginInterface = pluginInterface;
@@ -86,13 +84,13 @@ public class PluginIterator<E> implements Iterator<E> {
     private void advance() {
         this.nextPlugin = null;
         while (!jars.isEmpty()) {
-            File jarFile = jars.pollFirst();
-            try (var jar = new JarFile(jarFile)) {
+            Path jarFilePath = jars.pollFirst();
+            try (var jar = new JarFile(jarFilePath.toFile())) {
                 var props = getPluginProps(jar);
                 String pluginClassName = props.getProperty(MAIN_CLASS_PROPERTY_NAME);
 
                 try {
-                    var classLoader = classloaderProvider.apply(new URL[]{Utils.convertToJarUrl(jarFile)});
+                    var classLoader = classloaderProvider.apply(new URL[]{Utils.convertToJarUrl(jarFilePath)});
                     Class<?> pluginClass = classLoader.loadClass(pluginClassName);
                     this.nextPlugin = pluginClass.asSubclass(pluginInterface).getDeclaredConstructor().newInstance();
                     return;

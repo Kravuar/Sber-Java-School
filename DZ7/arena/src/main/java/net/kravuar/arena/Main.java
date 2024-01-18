@@ -1,6 +1,5 @@
 package net.kravuar.arena;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URI;
@@ -87,15 +86,15 @@ public class Main {
     private record URLs(URL[] common, URL[] core) {}
 
     private static URLs loadFromJar() throws URISyntaxException {
-        File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        Path jarFilePath = Path.of(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
-        try (var ignored = new JarFile(jarFile)) {
+        try (var ignored = new JarFile(jarFilePath.toFile())) {
             List<URL> commonUrls = new ArrayList<>();
             List<URL> coreUrls = new ArrayList<>();
 
-            commonUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/lib/common/").toURL());
-            coreUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/lib/core/").toURL());
-            coreUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/").toURL());
+            commonUrls.add(URI.create("jar:" + jarFilePath.toUri().toURL() + "!/lib/common/").toURL());
+            coreUrls.add(URI.create("jar:" + jarFilePath.toUri().toURL() + "!/lib/core/").toURL());
+            coreUrls.add(URI.create("jar:" + jarFilePath.toUri().toURL() + "!/").toURL());
 
             return new URLs(
                     commonUrls.toArray(URL[]::new),
