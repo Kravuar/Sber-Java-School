@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Arena {
-    private final int roundsPerBattle;
+    private final int roundsToWinBattle;
     private final PluginIterator pluginIterator;
     private RockPaperScissorsPlugin firstParticipant;
 
-    public Arena(Path pluginsDirPath, int roundsPerBattle) {
-        if (roundsPerBattle % 2 != 1)
+    public Arena(Path pluginsDirPath, int roundsToWinBattle) {
+        if (roundsToWinBattle % 2 != 1)
             throw new IllegalArgumentException("Rounds per battle should be odd and greater than 1.");
 
         this.pluginIterator = new PluginIterator(pluginsDirPath);
-        this.roundsPerBattle = roundsPerBattle;
+        this.roundsToWinBattle = roundsToWinBattle;
         if (!pluginIterator.hasNext())
             throw new IllegalArgumentException("Directory doesn't contain any plugins.");
         this.firstParticipant = pluginIterator.next();
@@ -38,15 +38,15 @@ public class Arena {
         List<RoundHistory> history = new ArrayList<>();
         int firstWinCount = 0;
         int secondWinCount = 0;
-        for (int i = 0; i < roundsPerBattle; ++i) {
+        while (firstWinCount != roundsToWinBattle && secondWinCount != roundsToWinBattle) {
             var firstParticipantOption = firstParticipant.act();
             var secondParticipantOption = secondParticipant.act();
             history.add(new RoundHistory(firstParticipantOption, secondParticipantOption));
 
-            switch (RockPaperScissorsPlugin.Option.Outcome.getOutcome(firstParticipantOption, secondParticipantOption)) {
+            switch (firstParticipantOption.getOutcome(secondParticipantOption)) {
                 case WIN -> firstWinCount++;
                 case DEFEAT -> secondWinCount++;
-                case TIE -> --i; /*continue*/
+                case TIE -> {/*continue*/}
             }
         }
 

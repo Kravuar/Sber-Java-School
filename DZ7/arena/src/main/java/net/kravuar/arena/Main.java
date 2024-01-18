@@ -59,12 +59,12 @@ public class Main {
                         continue;
                     }
 
-                    System.out.print("Enter round per battle value: ");
-                    int roundsPerBattle = scanner.nextInt();
+                    System.out.print("Enter the number of rounds to win the battle: ");
+                    int roundsToWinBattle = scanner.nextInt();
                     scanner.nextLine();
 
                     try {
-                        Runnable runnerInstance = (Runnable) runnerConstructor.newInstance(pluginsDir, roundsPerBattle);
+                        Runnable runnerInstance = (Runnable) runnerConstructor.newInstance(pluginsDir, roundsToWinBattle);
                         runnerInstance.run();
                     } catch (Throwable e) {
                         System.out.println("Couldn't start Arena: " + e.getMessage());

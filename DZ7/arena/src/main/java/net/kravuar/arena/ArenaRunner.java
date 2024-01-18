@@ -6,8 +6,8 @@ import java.util.stream.IntStream;
 public class ArenaRunner implements Runnable {
     private final Arena arena;
 
-    public ArenaRunner(Path pluginDirectoryPath, int roundsPerBattle) {
-        this.arena = new Arena(pluginDirectoryPath, roundsPerBattle);
+    public ArenaRunner(Path pluginDirectoryPath, int roundsToWinBattle) {
+        this.arena = new Arena(pluginDirectoryPath, roundsToWinBattle);
     }
 
     @Override

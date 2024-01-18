@@ -12,6 +12,10 @@ public interface RockPaperScissorsPlugin {
         PAPER,
         SCISSORS;
 
+        public Outcome getOutcome(Option opponentOption) {
+            return Outcome.getOutcome(this, opponentOption);
+        }
+
         public enum Outcome {
             DEFEAT(Map.of(
                     PAPER, SCISSORS,
