@@ -13,9 +13,9 @@
 
     <properties>
         <plugin-api.version>1.0-SNAPSHOT</plugin-api.version>
+        <plugin.manager.version>1.0-SNAPSHOT</plugin.manager.version>
         <maven.dependency.version>3.6.1</maven.dependency.version>
         <maven.assembly.version>3.6.0</maven.assembly.version>
-        <maven.shade.version>3.5.1</maven.shade.version>
     </properties>
 
     <dependencies>
@@ -25,9 +25,9 @@
             <version>${plugin-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apiguardian</groupId>
-            <artifactId>apiguardian-api</artifactId>
-            <version>1.1.2</version>
+            <groupId>net.kravuar</groupId>
+            <artifactId>plugin-manager</artifactId>
+            <version>${plugin.manager.version}</version>
         </dependency>
     </dependencies>
 
@@ -38,7 +38,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>${maven.dependency.version}</version>
                 <executions>
-                    <!-- Common dependencies -->
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>prepare-package</phase>

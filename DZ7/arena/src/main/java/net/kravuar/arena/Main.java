@@ -3,7 +3,10 @@ package net.kravuar.arena;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -91,7 +94,7 @@ public class Main {
             List<URL> coreUrls = new ArrayList<>();
 
             commonUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/lib/common/").toURL());
-            // Jar itself (with core and sources)
+            coreUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/lib/core/").toURL());
             coreUrls.add(URI.create("jar:" + jarFile.toURI().toURL() + "!/").toURL());
 
             return new URLs(

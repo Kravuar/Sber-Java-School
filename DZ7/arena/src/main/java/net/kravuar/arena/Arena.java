@@ -2,20 +2,20 @@ package net.kravuar.arena;
 
 import net.kravuar.plugin.RockPaperScissorsPlugin;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Arena {
     private final int roundsToWinBattle;
-    private final PluginIterator pluginIterator;
+    private final Iterator<RockPaperScissorsPlugin> pluginIterator;
     private RockPaperScissorsPlugin firstParticipant;
 
-    public Arena(Path pluginsDirPath, int roundsToWinBattle) {
+    public Arena(Iterator<RockPaperScissorsPlugin> pluginIterator, int roundsToWinBattle) {
         if (roundsToWinBattle % 2 != 1)
             throw new IllegalArgumentException("Rounds per battle should be odd and greater than 1.");
 
-        this.pluginIterator = new PluginIterator(pluginsDirPath);
+        this.pluginIterator = pluginIterator;
         this.roundsToWinBattle = roundsToWinBattle;
         if (!pluginIterator.hasNext())
             throw new IllegalArgumentException("Directory doesn't contain any plugins.");

@@ -1,5 +1,8 @@
 package net.kravuar.arena;
 
+import net.PluginManager;
+import net.kravuar.plugin.RockPaperScissorsPlugin;
+
 import java.nio.file.Path;
 import java.util.stream.IntStream;
 
@@ -7,7 +10,13 @@ public class ArenaRunner implements Runnable {
     private final Arena arena;
 
     public ArenaRunner(Path pluginDirectoryPath, int roundsToWinBattle) {
-        this.arena = new Arena(pluginDirectoryPath, roundsToWinBattle);
+        var iterator = new PluginManager<>(
+                pluginDirectoryPath,
+                RockPaperScissorsPlugin.class,
+                getClass().getClassLoader().getParent(),
+                true
+        ).iterator();
+        this.arena = new Arena(iterator, roundsToWinBattle);
     }
 
     @Override

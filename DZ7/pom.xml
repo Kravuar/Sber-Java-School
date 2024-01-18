@@ -12,6 +12,7 @@
         <module>plugin-api</module>
         <module>arena</module>
         <module>plugins</module>
+        <module>plugin-manager</module>
     </modules>
 
     <properties>
