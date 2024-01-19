@@ -18,7 +18,7 @@ public class DecodingClassloader extends ClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         try {
-            Path fullPath = dir.resolve(name.replace('.', File.separatorChar) + ".class");
+            Path fullPath = dir.resolve(name.replace('.', File.separatorChar));
             byte[] classBytes = Files.readAllBytes(fullPath);
             decode(classBytes);
 
