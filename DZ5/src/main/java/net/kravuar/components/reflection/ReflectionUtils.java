@@ -31,7 +31,7 @@ public class ReflectionUtils {
      */
     public static void printAllGetters(Class<?> clazz) {
         getAllMethods(clazz)
-                .filter(method -> method.getName().toLowerCase().startsWith("get") || method.getName().toLowerCase().startsWith("is"))
+                .filter(ReflectionUtils::isGetter)
                 .forEach((method) -> System.out.format(
                         "Getter Method: %s%n",
                         method.toGenericString()
@@ -57,6 +57,34 @@ public class ReflectionUtils {
                         throw new RuntimeException(e);
                     }
                 }).collect(Collectors.toSet());
+    }
+
+    /**
+     * Check whether provided method is a getter.
+     *
+     * @return {@code boolean} result
+     */
+    public static boolean isGetter(Method method) {
+        var methodName = method.getName();
+        boolean hasPrefix = methodName.startsWith("get") || methodName.startsWith("is");
+        return hasPrefix
+                && Modifier.isPublic(method.getModifiers())
+                && method.getReturnType() != void.class
+                && method.getParameterCount() == 0;
+    }
+
+    /**
+     * Check whether provided method is a setter.
+     *
+     * @return {@code boolean} result
+     */
+    public static boolean isSetter(Method method) {
+        var methodName = method.getName();
+        boolean hasPrefix = methodName.startsWith("set");
+        return hasPrefix
+                && Modifier.isPublic(method.getModifiers())
+                && method.getReturnType() == void.class
+                && method.getParameterCount() == 1;
     }
 
     private static Stream<Method> getAllMethods(Class<?> clazz) {

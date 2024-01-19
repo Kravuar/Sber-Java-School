@@ -1,5 +1,7 @@
 package net.kravuar.components.beans;
 
+import net.kravuar.components.reflection.ReflectionUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -24,13 +26,13 @@ public class BeanUtils {
      */
     public static void assign(Object to, Object from) {
         var toSetters = Arrays.stream(to.getClass().getMethods())
-                .filter(method -> method.getName().startsWith("set"))
+                .filter(ReflectionUtils::isSetter)
                 .collect(Collectors.toMap(
                         method -> method.getName().replace("set", ""),
                         Function.identity()
                 ));
         Arrays.stream(from.getClass().getMethods())
-                .filter(method -> method.getName().startsWith("get") || method.getName().toLowerCase().startsWith("is"))
+                .filter(ReflectionUtils::isGetter)
                 .forEach(getter -> {
                     var getterType = getter.getReturnType();
                     var propertyName = getter.getName().startsWith("get")
