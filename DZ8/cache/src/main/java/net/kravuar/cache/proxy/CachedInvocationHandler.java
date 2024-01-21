@@ -1,9 +1,12 @@
-package net.kravuar.cache;
+package net.kravuar.cache.proxy;
 
 import lombok.RequiredArgsConstructor;
+import net.kravuar.cache.Cache;
+import net.kravuar.cache.CacheResolver;
 import net.kravuar.cache.addapting.ValueWrapper;
 import net.kravuar.cache.annotations.Cached;
 import net.kravuar.cache.annotations.CachedParameter;
+import net.kravuar.cache.annotations.SizeLimited;
 import net.kravuar.cache.key.KeyGenerator;
 import net.kravuar.cache.key.KeyGeneratorResolver;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
@@ -48,6 +52,8 @@ public class CachedInvocationHandler implements InvocationHandler {
         if (cached == null) {
             log.info("Cache MISS on invocation: {} with params {}.", method.toGenericString(), args);
             value = invoke(method, args);
+            if (List.class.isAssignableFrom(method.getReturnType()) && method.isAnnotationPresent(SizeLimited.class))
+                value = limitCache((List<?>) value, method.getAnnotation(SizeLimited.class));
             cache.put(key, value);
         } else {
             log.info("Cache HIT on invocation: {} with params {}.", method.toGenericString(), args);
@@ -78,5 +84,14 @@ public class CachedInvocationHandler implements InvocationHandler {
                             ? new ValueWrapper(args[i])
                             : null;
                 }).toArray(ValueWrapper[]::new);
+    }
+
+    private List<?> limitCache(List<?> list, SizeLimited annotation) {
+        var amount = annotation.amount();
+        if (amount < 0)
+            throw new CachedInvocationException(String.format("Limit amount cannot be negative. Received %d.", amount));
+        return list.stream()
+                .limit(amount)
+                .toList();
     }
 }

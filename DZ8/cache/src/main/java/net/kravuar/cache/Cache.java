@@ -6,7 +6,7 @@ public interface Cache {
     /**
      * Return the value to which this cache maps the specified key.
      *
-     * @param key the key whose associated value is to be returned
+     * @param key the key whose associated value is to be returned.
      * @return the value to which this cache maps the specified key,
      * contained within a {@link ValueWrapper} which may also hold
      * a cached {@code null} or any other special value. A straight {@code null} being

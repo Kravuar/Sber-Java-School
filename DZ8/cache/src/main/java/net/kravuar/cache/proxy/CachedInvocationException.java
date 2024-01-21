@@ -1,4 +1,4 @@
-package net.kravuar.cache;
+package net.kravuar.cache.proxy;
 
 public class CachedInvocationException extends RuntimeException {
     public CachedInvocationException(Throwable cause) {

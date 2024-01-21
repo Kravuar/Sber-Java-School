@@ -5,6 +5,7 @@ import net.kravuar.cache.annotations.Cached;
 import net.kravuar.cache.annotations.CachedParameter;
 import net.kravuar.cache.key.KeyGenerator;
 import net.kravuar.cache.key.KeyGeneratorResolver;
+import net.kravuar.cache.proxy.CachedInvocationHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
