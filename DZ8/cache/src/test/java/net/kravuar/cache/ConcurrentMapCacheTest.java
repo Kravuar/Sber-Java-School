@@ -4,8 +4,7 @@ import net.kravuar.cache.addapting.ValueWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ConcurrentMapCacheTest {
     private ConcurrentMapCache cache;
@@ -17,77 +16,88 @@ class ConcurrentMapCacheTest {
 
     @Test
     void putEntry_ThenGet_ReturnsWrapped() {
-        // Given
+        // given
         Object key = "key";
         Object value = "value";
         cache.put(key, value);
 
-        // When
+        // when
         ValueWrapper result = cache.get(key);
 
-        // Then
+        // then
         assertEquals(value, result.value());
     }
 
     @Test
     void entryDoesNotExist_ThenGet_ReturnsNull() {
-        // Given
+        // given
         Object key = "nonExistingKey";
 
-        // When
+        // when
         ValueWrapper result = cache.get(key);
 
-        // Then
+        // then
         assertNull(result);
     }
 
     @Test
     void putEntry_ThenReplace_ReturnsReplaced() {
-        // Given
+        // given
         Object key = "key";
         Object originalValue = "value";
         Object updatedValue = "updatedValue";
         cache.put(key, originalValue);
 
-        // When
+        // when
         cache.put(key, updatedValue);
 
-        // Then
+        // then
         ValueWrapper result = cache.get(key);
         assertEquals(updatedValue, result.value());
     }
 
     @Test
     void putNull_ThenGet_ReturnsWrappedNull() {
-        // Given
+        // given
         Object key = "key";
         cache.put(key, null);
 
-        // When
+        // when
         ValueWrapper result = cache.get(key);
 
-        // Then
+        // then
         assertNull(result.value());
     }
 
     @Test
+    void nullIsNotAllowed_putNull_ThrowsIllegalArgumentException() {
+        // given
+        cache = new ConcurrentMapCache(false);
+        Object key = "key";
+        cache.put(key, null);
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> cache.get(key));
+    }
+
+    @Test
     void putEntry_ThenEvict_ReturnsNull() {
-        // Given
+        // given
         Object key = "key";
         Object value = "value";
         cache.put(key, value);
 
-        // When
+        // when
         cache.evict(key);
 
-        // Then
+        // then
         ValueWrapper result = cache.get(key);
         assertNull(result);
     }
 
     @Test
     void putEntries_ThenClear_ReturnsNullForEach() {
-        // Given
+        // given
         Object key1 = "key1";
         Object value1 = "value1";
         Object key2 = "key2";
@@ -95,10 +105,10 @@ class ConcurrentMapCacheTest {
         cache.put(key1, value1);
         cache.put(key2, value2);
 
-        // When
+        // when
         cache.clear();
 
-        // Then
+        // then
         ValueWrapper result1 = cache.get(key1);
         ValueWrapper result2 = cache.get(key2);
 

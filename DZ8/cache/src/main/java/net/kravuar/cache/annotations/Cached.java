@@ -20,7 +20,7 @@ public @interface Cached {
     /**
      * The name of the {@link Cache} instance to use for this method.
      * Default is "", which results in a name inferred as
-     * {@code Class.getName() + Method.getName()}.
+     * {@code Method.toGenericString()}.
      * Will create new instance of cache, if there wasn't one for that name
      * in the specified cache registry.
      */

@@ -29,6 +29,8 @@ public class CachedInvocationHandler implements InvocationHandler {
 
         String cacheRegistryName = annotation.cacheRegistry();
         String cacheName = annotation.cache();
+        if (cacheName.isEmpty())
+            cacheName = method.toGenericString();
         Cache cache = cacheResolver.getCache(cacheRegistryName, cacheName);
         if (cache == null)
             throw new CachedInvocationException(String.format("No cache could be resolved for registry %s and name %s.", cacheRegistryName, cacheName));
@@ -67,6 +69,8 @@ public class CachedInvocationHandler implements InvocationHandler {
     }
 
     private ValueWrapper[] getParametersWrapped(Method method, Object[] args) {
+        if (args == null)
+            return new ValueWrapper[] {};
         return IntStream.range(0, args.length)
                 .mapToObj(i -> {
                     var isRequired = method.getParameters()[i].isAnnotationPresent(CachedParameter.class);
