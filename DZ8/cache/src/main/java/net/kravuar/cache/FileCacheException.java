@@ -1,6 +1,8 @@
 package net.kravuar.cache;
 
-public class FileCacheException extends RuntimeException {
+import net.kravuar.cache.proxy.CachedInvocationException;
+
+public class FileCacheException extends CachedInvocationException {
     public FileCacheException(String message, Throwable cause) {
         super(message, cause);
     }

@@ -3,19 +3,22 @@ package net.kravuar.cache;
 import net.kravuar.cache.addapting.ValueWrapper;
 import net.kravuar.cache.annotations.Cached;
 import net.kravuar.cache.annotations.CachedParameter;
+import net.kravuar.cache.annotations.SizeLimited;
 import net.kravuar.cache.key.KeyGenerator;
 import net.kravuar.cache.key.KeyGeneratorResolver;
 import net.kravuar.cache.proxy.CachedInvocationHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,8 +81,7 @@ class CachedInvocationHandlerTest {
         Object b = new Object();
         Object key = "beb";
         //                                           only explicit varargs work...
-        when(keyGenerator.generate(eq(target), eq(method), any(), any()))
-                .thenReturn(key);
+        when(keyGenerator.generate(eq(target), eq(method), any(), any())).thenReturn(key);
         doNothing().when(cache).put(any(), any());
 
         // when
@@ -109,8 +111,7 @@ class CachedInvocationHandlerTest {
         Object b = new Object();
         Object key = "beb";
         //                                                   Omitted
-        when(keyGenerator.generate(eq(target), eq(method), eq(null), any()))
-                .thenReturn(key);
+        when(keyGenerator.generate(eq(target), eq(method), eq(null), any())).thenReturn(key);
         doNothing().when(cache).put(any(), any());
 
         // when
@@ -140,8 +141,7 @@ class CachedInvocationHandlerTest {
         Object b2 = new Object();
         Object key = "beb";
         //                                                   Omitted
-        when(keyGenerator.generate(eq(target), eq(method), eq(null), any()))
-                .thenReturn(key);
+        when(keyGenerator.generate(eq(target), eq(method), eq(null), any())).thenReturn(key);
         doNothing().when(cache).put(any(), any());
 
         when(cache.get(key)).thenReturn(null);
@@ -166,9 +166,7 @@ class CachedInvocationHandlerTest {
         // given
         Method method = ITarget.class.getMethod("cachedNoArg");
         Object key = "beb";
-        //                                                 No args
-        when(keyGenerator.generate(eq(target), eq(method)))
-                .thenReturn(key);
+        when(keyGenerator.generate(eq(target), eq(method))).thenReturn(key);
         doNothing().when(cache).put(any(), any());
 
         // when
@@ -188,6 +186,28 @@ class CachedInvocationHandlerTest {
         verify(target, times(1)).cachedNoArg();
     }
 
+    @Test
+    void givenCachedMethodWithSizeLimit_WhenCacheAndRetrieve_ThenCachedIsTruncated() throws NoSuchMethodException {
+        // given
+        Method method = ITarget.class.getMethod("list");
+        Object key = "beb";
+        List<Object> returnList = List.of(1,2,3,4,5);
+        int limit = method.getAnnotation(SizeLimited.class).amount();
+
+        when(keyGenerator.generate(eq(target), eq(method))).thenReturn(key);
+        doNothing().when(cache).put(any(), any());
+        when(target.list()).thenReturn(returnList);
+        when(cache.get(key)).thenReturn(null);
+
+        // when
+        var capturedList = ArgumentCaptor.forClass(List.class);
+        cachedTarget.list();
+
+        // then
+        verify(cache, times(1)).put(any(), capturedList.capture());
+        assertEquals(limit, capturedList.getValue().size());
+    }
+
     private interface ITarget {
         @Cached
         Object cached(Object a, Object b);
@@ -199,5 +219,9 @@ class CachedInvocationHandlerTest {
         Object cachedNoArg();
 
         Object nonCached(Object a, Object b);
+
+        @Cached
+        @SizeLimited(amount = 2)
+        List<Object> list();
     }
 }
