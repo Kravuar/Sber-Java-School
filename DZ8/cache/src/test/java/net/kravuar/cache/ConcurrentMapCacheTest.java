@@ -74,10 +74,9 @@ class ConcurrentMapCacheTest {
         // given
         cache = new ConcurrentMapCache(false);
         Object key = "key";
-        cache.put(key, null);
 
-        // when & then
-        assertThrows(IllegalArgumentException.class, () -> cache.get(key));
+        // when then
+        assertThrows(IllegalArgumentException.class, () -> cache.put(key, null));
     }
 
     @Test
