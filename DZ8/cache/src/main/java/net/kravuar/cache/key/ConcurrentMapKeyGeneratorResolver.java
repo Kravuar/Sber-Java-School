@@ -10,14 +10,14 @@ import java.util.concurrent.ConcurrentMap;
  * Contains {@link SimpleKeyGenerator} associated with {@code ""}.
  */
 public class ConcurrentMapKeyGeneratorResolver implements KeyGeneratorResolver {
-    private final ConcurrentMap<String, KeyGenerator> resolvers;
+    private final ConcurrentMap<String, KeyGenerator> registry;
 
-    public ConcurrentMapKeyGeneratorResolver(Map<String, KeyGenerator> resolvers) {
-        this.resolvers = new ConcurrentHashMap<>(resolvers);
+    public ConcurrentMapKeyGeneratorResolver(Map<String, KeyGenerator> registry) {
+        this.registry = new ConcurrentHashMap<>(registry);
     }
 
     @Override
     public KeyGenerator resolve(@NonNull String name) {
-        return resolvers.get(name);
+        return registry.get(name);
     }
 }
