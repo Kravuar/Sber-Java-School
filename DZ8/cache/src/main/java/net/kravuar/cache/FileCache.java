@@ -15,24 +15,26 @@ import java.nio.file.Path;
 public class FileCache extends AbstractNullAdaptingCache {
     @Getter
     protected final Path directory;
-    @Getter
-    protected final String suffix;
 
     /**
      * Constructs {@code FileCache} with the given setting.
      *
      * @param allowNullValues whether to allow for {@code null} values.
-     * @param directory directory in which cache files will be stored.
-     * @param suffix suffix (without trailing '.') that will be appended to cache files (will be used to prevent deletion of non cache files).
+     * @param directory       directory in which cache files will be stored.
      * @throws IllegalArgumentException if {@code directory} does not exist;
-     * is not a directory; or it cannot be determined if the file is a directory or not.
+     *                                  is not a directory; cannot be determined if the file is a directory or not;
+     *                                  or is not empty.
+     * @throws IOException              if IO errors occurred upon checkin if the directory is empty.
      */
-    public FileCache(boolean allowNullValues, Path directory, String suffix) {
+    public FileCache(boolean allowNullValues, Path directory) throws IOException {
         super(allowNullValues);
         if (!Files.isDirectory(directory))
             throw new IllegalArgumentException("Incorrect directory path.");
+        try (var files = Files.list(directory)) {
+            if (files.findAny().isPresent())
+                throw new IllegalArgumentException("Directory is not empty.");
+        }
         this.directory = directory;
-        this.suffix = '.' + suffix;
     }
 
     /**
@@ -43,7 +45,7 @@ public class FileCache extends AbstractNullAdaptingCache {
      */
     @Override
     protected Object lookup(Object key) {
-        try (ObjectInputStream ois = getInputStream(key)) {
+        try (ObjectInputStream ois = new ObjectInputStream(getInputStream(key))) {
             return ois.readObject();
         } catch (FileNotFoundException | NoSuchFileException ignored) {
             return null;
@@ -55,14 +57,14 @@ public class FileCache extends AbstractNullAdaptingCache {
     /**
      * Stores cache value in the configured directory.
      *
-     * @param key the key with which the specified value is to be associated.
+     * @param key   the key with which the specified value is to be associated.
      * @param value the value to be associated with the specified key.
      * @throws IllegalArgumentException if a value is not serializable.
-     * @throws FileCacheException if IO errors occurred upon saving.
+     * @throws FileCacheException       if IO errors occurred upon saving.
      */
     @Override
     public void put(Object key, Object value) {
-        try (ObjectOutputStream ous = getOutputStream(key)) {
+        try (ObjectOutputStream ous = new ObjectOutputStream(getOutputStream(key))) {
             ous.writeObject(value);
         } catch (NotSerializableException e) {
             throw new IllegalArgumentException(String.format("%s class is not serializable.", value.getClass()));
@@ -94,14 +96,12 @@ public class FileCache extends AbstractNullAdaptingCache {
      */
     @Override
     public synchronized void clear() {
-        try (var directoryFiles = Files.list(directory).filter(Files::isRegularFile)) {
-            directoryFiles
-                    .filter(file -> file.getFileName().toString().endsWith(suffix))
-                    .forEach(file -> {
+        try (var directoryFiles = Files.walk(directory).skip(1)) {
+            directoryFiles.forEach(file -> {
                 try {
                     Files.deleteIfExists(file);
                 } catch (IOException e) {
-                    throw new FileCacheException("Could not evict cache value for key: " + fileNameToKeyString(file.getFileName().toString()) + ": " + e.getMessage(), e);
+                    throw new FileCacheException("Could not evict cache value for key: " + file.getFileName().toString() + ": " + e.getMessage(), e);
                 }
             });
         } catch (IOException e) {
@@ -109,23 +109,19 @@ public class FileCache extends AbstractNullAdaptingCache {
         }
     }
 
-    protected Object fileNameToKeyString(String fileName) {
-        return fileName.substring(0, fileName.length() - suffix.length());
-    }
-
     protected String keyToFileName(Object key) {
-        return key.toString() + suffix;
+        return key.toString();
     }
 
     protected Path keyToPath(Object key) {
-        return this.directory.resolve(keyToFileName(key));
+        return directory.resolve(keyToFileName(key));
     }
 
-    protected ObjectOutputStream getOutputStream(Object key) throws IOException {
-        return new ObjectOutputStream(Files.newOutputStream(keyToPath(key)));
+    protected OutputStream getOutputStream(Object key) throws IOException {
+        return Files.newOutputStream(keyToPath(key));
     }
 
-    protected ObjectInputStream getInputStream(Object key) throws IOException {
-        return new ObjectInputStream(Files.newInputStream(keyToPath(key)));
+    protected InputStream getInputStream(Object key) throws IOException {
+        return Files.newInputStream(keyToPath(key));
     }
 }

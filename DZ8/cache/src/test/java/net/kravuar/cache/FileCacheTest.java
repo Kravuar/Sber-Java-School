@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileCacheTest {
     private final Path dir;
-    private final String suffix = "cache";
     private FileCache fileCache;
 
     FileCacheTest() throws IOException {
@@ -32,21 +31,37 @@ class FileCacheTest {
     }
 
     @Test
-    void givenExistingCacheValue_WhenPutAndRetrieve_ThenOk() {
+    void givenCacheValue_WhenPutAndRetrieve_ThenOk() throws IOException {
         // given
-        fileCache = new FileCache(true, dir, suffix);
+        fileCache = new FileCache(true, dir);
         String value = "bebe";
         String key = "key";
+
+        // when
         fileCache.put(key, value);
 
-        // when & then
+        // then
         assertNotNull(fileCache.get(key));
     }
 
     @Test
-    void givenExistingCacheValue_WhenEvicting_ThenValueDeleted() {
+    void givenTwoCacheValuesForSameKey_WhenPutBothAndRetrieve_ThenLastOneReturned() throws IOException {
         // given
-        fileCache = new FileCache(true, dir, suffix);
+        fileCache = new FileCache(true, dir);
+        String value1 = "bebe1";
+        String key = "key1";
+        String value2 = "bebe2";
+        fileCache.put(key, value1);
+        fileCache.put(key, value2);
+
+        // when & then
+        assertEquals(value2, fileCache.get(key).value());
+    }
+
+    @Test
+    void givenExistingCacheValue_WhenEvicting_ThenValueDeleted() throws IOException {
+        // given
+        fileCache = new FileCache(true, dir);
         String value = "bebe";
         String key = "key";
         fileCache.put(key, value);
@@ -59,9 +74,9 @@ class FileCacheTest {
     }
 
     @Test
-    void givenNonExistingCacheValue_WhenRetrieve_ThenNull() {
+    void givenNonExistingCacheValue_WhenRetrieve_ThenNull() throws IOException {
         // given
-        fileCache = new FileCache(true, dir, suffix);
+        fileCache = new FileCache(true, dir);
         String key = "key";
 
         // when & then
@@ -71,7 +86,7 @@ class FileCacheTest {
     @Test
     void givenCacheWithValues_WhenClear_ThenDirEmpty() throws IOException {
         // Given
-        fileCache = new FileCache(true, dir, suffix);
+        fileCache = new FileCache(true, dir);
         fileCache.put("key1", "value1");
         fileCache.put("key2", "value2");
 
@@ -86,9 +101,9 @@ class FileCacheTest {
     }
 
     @Test
-    void givenNonSerializableValue_WhenPuttingValue_ThenThrowsIllegalArgumentException() {
+    void givenNonSerializableValue_WhenPuttingValue_ThenThrowsIllegalArgumentException() throws IOException {
         // given
-        fileCache = new FileCache(true, dir, suffix);
+        fileCache = new FileCache(true, dir);
         Object value = new Object();
         String key = "key";
 
@@ -102,6 +117,6 @@ class FileCacheTest {
         Path nonExistingDir = Path.of("hopefullythisdoesnotexist");
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> new FileCache(true, nonExistingDir, suffix));
+        assertThrows(IllegalArgumentException.class, () -> new FileCache(true, nonExistingDir));
     }
 }
