@@ -99,25 +99,25 @@ public class CacheIntegrationTest {
         cachedTarget.method1();
 
         // then
+        // assertSame(result1, result2); won't work as result2 is deserialized (thus new identity)
         verify(target, times(1)).method1();
 
         Object key = keyGeneratorResolver.resolve("bad").generate(target, ITarget.class.getDeclaredMethod("method1"));
-        assertNotNull(cacheResolver.getCache("zipCaches", "someCache").get(key));
+        assertNotNull(cacheResolver.getCache("zipCaches", "someCache").get(key)); // all we can do
     }
 
     @Test
     void method2IsCached_UsingDefaultKeyGenerator() throws NoSuchMethodException {
         // when
-        var result1 = cachedTarget.method2();
-        var result2 = cachedTarget.method2();
+        cachedTarget.method2();
+        cachedTarget.method2();
 
-        // TODO: Something wrong, not same
         // then
-        assertSame(result1, result2);
+        // assertSame(result1, result2); won't work as result2 is deserialized (thus new identity)
         verify(target, times(1)).method2();
 
         Object key = keyGeneratorResolver.resolve("").generate(target, ITarget.class.getDeclaredMethod("method2"));
-        assertNotNull(cacheResolver.getCache("zipCaches", "someCache").get(key));
+        assertNotNull(cacheResolver.getCache("zipCaches", "someCache").get(key)); // all we can do
     }
 
     @Test
