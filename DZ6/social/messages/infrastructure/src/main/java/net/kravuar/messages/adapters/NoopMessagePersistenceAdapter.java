@@ -5,8 +5,8 @@ import net.kravuar.messages.ports.out.MessagePersistencePort;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NoopMessagePersistencePort implements MessagePersistencePort {
-    private final Logger log = LogManager.getLogger(NoopMessagePersistencePort.class);
+public class NoopMessagePersistenceAdapter implements MessagePersistencePort {
+    private final Logger log = LogManager.getLogger(NoopMessagePersistenceAdapter.class);
 
     @Override
     public Message save(Message message) {

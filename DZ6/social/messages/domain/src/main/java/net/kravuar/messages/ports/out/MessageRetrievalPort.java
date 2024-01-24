@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface MessageRetrievalPort {
     Optional<Message> findById(long id);
-    List<Message> findAllBySender(long senderId);
-    List<Message> findAllByReceiver(long receiverId);
+    List<Message> findAllBySenderIdAndReceiverId(long senderId, long receiverId);
 }

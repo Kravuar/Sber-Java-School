@@ -7,8 +7,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 
-public class NoopAccountRetrievalPort implements AccountRetrievalPort {
-    private final Logger log = LogManager.getLogger(NoopAccountRetrievalPort.class);
+public class NoopAccountRetrievalAdapter implements AccountRetrievalPort {
+    private final Logger log = LogManager.getLogger(NoopAccountRetrievalAdapter.class);
 
     @Override
     public Optional<Account> findById(long id) {

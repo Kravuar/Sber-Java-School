@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class NoopFriendshipRetrievalPort implements FriendshipRetrievalPort {
-    private final Logger log = LogManager.getLogger(NoopFriendshipRetrievalPort.class);
+public class NoopFriendshipRetrievalAdapter implements FriendshipRetrievalPort {
+    private final Logger log = LogManager.getLogger(NoopFriendshipRetrievalAdapter.class);
 
     @Override
     public Optional<Friendship> findByParticipantIds(long fromUserId, long toUserId) {

@@ -4,8 +4,8 @@ import net.kravuar.friends.ports.out.AccountExistenceCheckPort;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NoopAccountExistenceCheckPort implements AccountExistenceCheckPort {
-    private final Logger log = LogManager.getLogger(NoopAccountExistenceCheckPort.class);
+public class NoopAccountExistenceCheckAdapter implements AccountExistenceCheckPort {
+    private final Logger log = LogManager.getLogger(NoopAccountExistenceCheckAdapter.class);
 
     @Override
     public boolean exists(long accountId) {

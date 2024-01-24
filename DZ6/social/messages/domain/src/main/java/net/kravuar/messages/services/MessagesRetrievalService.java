@@ -15,16 +15,11 @@ public class MessagesRetrievalService implements MessagesRetrievalUseCase {
     private final AccountExistenceCheckPort accountExistenceCheckPort;
 
     @Override
-    public List<Message> findAllBySender(long senderId) {
+    public List<Message> findAllBySenderIdAndReceiverId(long senderId, long receiverId) {
         if (!accountExistenceCheckPort.exists(senderId))
             throw new AccountNotFoundException(senderId);
-        return retrievalPort.findAllBySender(senderId);
-    }
-
-    @Override
-    public List<Message> findAllByReceiver(long receiverId) {
         if (!accountExistenceCheckPort.exists(receiverId))
             throw new AccountNotFoundException(receiverId);
-        return retrievalPort.findAllByReceiver(receiverId);
+        return retrievalPort.findAllBySenderIdAndReceiverId(senderId, receiverId);
     }
 }

@@ -4,8 +4,8 @@ import net.kravuar.user.ports.out.PasswordEncoderPort;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NoopPasswordEncoderPort implements PasswordEncoderPort {
-    private final Logger log = LogManager.getLogger(NoopPasswordEncoderPort.class);
+public class NoopPasswordEncoderAdapter implements PasswordEncoderPort {
+    private final Logger log = LogManager.getLogger(NoopPasswordEncoderAdapter.class);
 
     @Override
     public String encode(String password) {

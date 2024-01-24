@@ -7,20 +7,12 @@ import java.util.List;
 
 public interface MessagesRetrievalUseCase {
     /**
-     * Retrieves all messages sent by the specified sender.
+     * Retrieves all messages sent by the specified sender and receiver.
      *
      * @param senderId The ID of the sender.
-     * @return A list of messages sent by the specified sender.
-     * @throws AccountNotFoundException If the sender account does not exist.
-     */
-    List<Message> findAllBySender(long senderId);
-
-    /**
-     * Retrieves all messages received by the specified receiver.
-     *
      * @param receiverId The ID of the receiver.
-     * @return A list of messages received by the specified receiver.
-     * @throws AccountNotFoundException If the receiver account does not exist.
+     * @return A list of messages sent by the specified sender to specified receiver.
+     * @throws AccountNotFoundException If the sender or receiver account does not exist.
      */
-    List<Message> findAllByReceiver(long receiverId);
+    List<Message> findAllBySenderIdAndReceiverId(long senderId, long receiverId);
 }

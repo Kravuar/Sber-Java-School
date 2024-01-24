@@ -9,8 +9,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class NoopMessageRetrievalPort implements MessageRetrievalPort {
-    private final Logger log = LogManager.getLogger(NoopMessageRetrievalPort.class);
+public class NoopMessageRetrievalAdapter implements MessageRetrievalPort {
+    private final Logger log = LogManager.getLogger(NoopMessageRetrievalAdapter.class);
 
     @Override
     public Optional<Message> findById(long id) {
@@ -22,18 +22,10 @@ public class NoopMessageRetrievalPort implements MessageRetrievalPort {
     }
 
     @Override
-    public List<Message> findAllBySender(long senderId) {
+    public List<Message> findAllBySenderIdAndReceiverId(long senderId, long receiverId) {
         log.info(
-                "Finding all Messages by senderId={}",
-                senderId
-        );
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<Message> findAllByReceiver(long receiverId) {
-        log.info(
-                "Finding all Messages by receiverId={}",
+                "Finding all Messages by senderId={} and receiverId={}",
+                senderId,
                 receiverId
         );
         return Collections.emptyList();

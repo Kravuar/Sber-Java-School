@@ -5,8 +5,8 @@ import net.kravuar.friends.ports.out.FriendshipPersistencePort;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class NoopFriendshipPersistencePort implements FriendshipPersistencePort {
-    private final Logger log = LogManager.getLogger(NoopFriendshipPersistencePort.class);
+public class NoopFriendshipPersistenceAdapter implements FriendshipPersistencePort {
+    private final Logger log = LogManager.getLogger(NoopFriendshipPersistenceAdapter.class);
 
     @Override
     public Friendship save(Friendship friendship) {
