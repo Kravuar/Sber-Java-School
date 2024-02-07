@@ -1,5 +1,6 @@
 package net.kravuar.friends.services;
 
+import net.kravuar.friends.FriendshipManagementFacade;
 import net.kravuar.friends.model.Friendship;
 import net.kravuar.friends.model.exceptions.AccountNotFoundException;
 import net.kravuar.friends.model.exceptions.FriendshipBlockedException;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class FriendshipManagementServiceTest {
+class FriendshipManagementFacadeTest {
 
     @Mock
     private FriendshipRetrievalPort retrievalPort;
@@ -31,7 +32,7 @@ class FriendshipManagementServiceTest {
     private AccountExistenceCheckPort existenceCheckPort;
 
     @InjectMocks
-    private FriendshipManagementService managementService;
+    private FriendshipManagementFacade managementService;
 
     @Test
     void sendFriendRequest_ValidRequest_ReturnsPendingFriendship() {

@@ -1,4 +1,4 @@
-package net.kravuar.messages.services;
+package net.kravuar.messages;
 
 import lombok.RequiredArgsConstructor;
 import net.kravuar.messages.model.EditMessageRequest;
@@ -12,7 +12,7 @@ import net.kravuar.messages.ports.out.MessagePersistencePort;
 import net.kravuar.messages.ports.out.MessageRetrievalPort;
 
 @RequiredArgsConstructor
-public class MessageManagementService implements MessageManagementUseCase {
+public class MessageManagementFacade implements MessageManagementUseCase {
     private final MessagePersistencePort persistencePort;
     private final MessageRetrievalPort retrievalPort;
     private final AccountExistenceCheckPort accountExistenceCheckPort;

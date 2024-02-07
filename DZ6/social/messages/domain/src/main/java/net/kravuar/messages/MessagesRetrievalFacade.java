@@ -1,4 +1,4 @@
-package net.kravuar.messages.services;
+package net.kravuar.messages;
 
 import lombok.RequiredArgsConstructor;
 import net.kravuar.messages.model.Message;
@@ -10,7 +10,7 @@ import net.kravuar.messages.ports.out.MessageRetrievalPort;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class MessagesRetrievalService implements MessagesRetrievalUseCase {
+public class MessagesRetrievalFacade implements MessagesRetrievalUseCase {
     private final MessageRetrievalPort retrievalPort;
     private final AccountExistenceCheckPort accountExistenceCheckPort;
 

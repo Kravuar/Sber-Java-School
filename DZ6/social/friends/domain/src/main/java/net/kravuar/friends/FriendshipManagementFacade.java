@@ -1,4 +1,4 @@
-package net.kravuar.friends.services;
+package net.kravuar.friends;
 
 import lombok.RequiredArgsConstructor;
 import net.kravuar.friends.model.Friendship;
@@ -14,7 +14,7 @@ import net.kravuar.friends.ports.out.FriendshipRetrievalPort;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class FriendshipManagementService implements FriendshipManagementUseCase {
+public class FriendshipManagementFacade implements FriendshipManagementUseCase {
     private final FriendshipRetrievalPort friendshipRetrievalPort;
     private final FriendshipPersistencePort friendshipPersistencePort;
     private final AccountExistenceCheckPort accountExistenceCheckPort;

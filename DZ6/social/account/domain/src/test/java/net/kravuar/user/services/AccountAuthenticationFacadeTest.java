@@ -1,5 +1,6 @@
 package net.kravuar.user.services;
 
+import net.kravuar.user.AccountAuthenticationFacade;
 import net.kravuar.user.model.Account;
 import net.kravuar.user.model.AccountAuthenticationRequest;
 import net.kravuar.user.model.AccountRegistrationRequest;
@@ -22,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AccountAuthenticationServiceTest {
+class AccountAuthenticationFacadeTest {
 
     @Mock
     private PasswordEncoderPort passwordEncoderPort;
@@ -34,7 +35,7 @@ class AccountAuthenticationServiceTest {
     private AccountPersistencePort persistencePort;
 
     @InjectMocks
-    private AccountAuthenticationService authenticationService;
+    private AccountAuthenticationFacade authenticationService;
 
     @Test
     void authenticate_ValidCredentials_ReturnsAuthenticatedAccount() {

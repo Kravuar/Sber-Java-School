@@ -1,5 +1,6 @@
 package net.kravuar.messages.services;
 
+import net.kravuar.messages.MessageManagementFacade;
 import net.kravuar.messages.model.EditMessageRequest;
 import net.kravuar.messages.model.Message;
 import net.kravuar.messages.model.SendMessageRequest;
@@ -21,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class MessageManagementServiceTest {
+class MessageManagementFacadeTest {
 
     @Mock
     private MessagePersistencePort persistencePort;
@@ -33,7 +34,7 @@ class MessageManagementServiceTest {
     private AccountExistenceCheckPort existenceCheckPort;
 
     @InjectMocks
-    private MessageManagementService managementService;
+    private MessageManagementFacade managementService;
 
     @Test
     void sendMessage_ValidRequest_ReturnsNewMessage() {

@@ -1,4 +1,4 @@
-package net.kravuar.user.services;
+package net.kravuar.user;
 
 import lombok.RequiredArgsConstructor;
 import net.kravuar.user.model.Account;
@@ -13,7 +13,7 @@ import net.kravuar.user.ports.out.AccountRetrievalPort;
 import net.kravuar.user.ports.out.PasswordEncoderPort;
 
 @RequiredArgsConstructor
-public class AccountAuthenticationService implements AccountAuthenticationUseCase {
+public class AccountAuthenticationFacade implements AccountAuthenticationUseCase {
     private final PasswordEncoderPort passwordEncoderPort;
     private final AccountRetrievalPort retrievalPort;
     private final AccountPersistencePort persistencePort;
