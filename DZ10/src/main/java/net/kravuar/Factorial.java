@@ -38,8 +38,8 @@ public class Factorial {
     }
 
     public static BigInteger factorial(int number) {
-        if (number <= 0)
-            throw new IllegalArgumentException("Number isn't natural.");
+        if (number < 0)
+            throw new IllegalArgumentException("Number should be positive.");
         BigInteger r = BigInteger.valueOf(1);
         for (int i = 2; i <= number; ++i)
             r = r.multiply(BigInteger.valueOf(i));
