@@ -1,0 +1,39 @@
+.App {
+    display: flex;
+    flex-direction: row;
+    height: 95vh;
+    justify-content: space-between;
+    padding: 5px 20px 0px 20px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+label {
+    text-align: center;
+}
+
+.input {
+    margin-left: 10px;
+    margin-right: 10px;
+    align-self: center;
+}
+
+.init {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.reading {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.finished {
+    background-color: rgba(0, 255, 0, 0.1);
+}
+
+.invalid {
+    background-color: rgb(255, 0, 0, 0.1);
+}

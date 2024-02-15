@@ -1,0 +1,15 @@
+INSERT INTO account (username, email, email_verified)
+VALUES ('beb1', 'beb1@bebmail.ru', true),
+       ('beb2', 'beb2@bebmail.ru', true),
+       ('beb3', 'beb3@bebmail.ru', false),
+       ('beb4', 'beb4@bebmail.ru', false),
+       ('beb5', 'beb5@bebmail.ru', true),
+       ('beb6', 'beb6@bebmail.ru', false),
+       ('beb7', 'beb7@bebmail.ru', false),
+       ('beb8', 'beb8@bebmail.ru', true),
+       ('beb9', 'beb9@bebmail.ru', false),
+       ('beb10', 'beb10@bebmail.ru', false),
+       ('beb11', 'beb11@bebmail.ru', false),
+       ('beb12', 'beb12@bebmail.ru', true),
+       ('beb13', 'beb13@bebmail.ru', false),
+       ('beb14', 'beb14@bebmail.ru', false);
