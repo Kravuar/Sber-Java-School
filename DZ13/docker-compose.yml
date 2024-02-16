@@ -1,0 +1,13 @@
+version: '4.27'
+services:
+  back:
+    build: ./back
+    ports:
+      - "8080:8080"
+
+  front:
+    build: ./front
+    environment:
+      REACT_APP_BACKEND_URL: "http://localhost:8080/json"
+    ports:
+      - "3000:3000"

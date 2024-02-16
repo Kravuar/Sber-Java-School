@@ -12,7 +12,6 @@ import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -30,9 +29,9 @@ class JSONControllerTest {
     @Test
     void givenJsonArray_whenStream_ThenStreamOfNdjson() {
         // given
-        List<Map<String, Object>> ndjson = new ArrayList<>(2);
-        ndjson.add(Map.of());
-        ndjson.add(Map.of());
+        List<String> ndjson = new ArrayList<>(2);
+        ndjson.add("beb");
+        ndjson.add("beb");
 
         // when & then
         client.post()
@@ -42,7 +41,7 @@ class JSONControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_NDJSON)
-                .expectBodyList(Map.class)
+                .expectBodyList(String.class)
                 .hasSize(2);
     }
 

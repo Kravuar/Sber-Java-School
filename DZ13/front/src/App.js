@@ -1,7 +1,9 @@
 import {useState} from "react";
 import "./App.css";
 
-const baseUrl = "http://localhost:8080/json"
+const baseUrl = process.env.REACT_APP_BACKEND_URL
+    ? process.env.REACT_APP_BACKEND_URL
+    : 'http://localhost:8080/json'
 
 const OutputState = {
     Init: "init",
@@ -13,7 +15,7 @@ const OutputState = {
 function App() {
     const [delay, setDelay] = useState(500);
     const [input, setInput] = useState("");
-    const [output, setOutput] = useState("");
+    const [output, setOutput] = useState([]);
     const [cancelCallback, setCancelCallback] = useState(null);
     const [outputState, setOutputState] = useState(OutputState.Init);
 
@@ -22,11 +24,16 @@ function App() {
             cancelCallback();
     }
 
+    function stringify() {
+        return JSON.stringify(output);
+    }
+
     function onEndOfStream() {
         try {
-            JSON.parse(output);
+            JSON.parse(stringify());
         } catch (e) {
             setOutputState(OutputState.Invalid);
+            return;
         }
         setOutputState(OutputState.Finished);
     }
@@ -46,10 +53,11 @@ function App() {
             const decoder = new TextDecoder();
             let buf = '';
 
-            const loop = () =>
+            function loop(resolve) {
                 stream.read().then(({done, value}) => {
                     if (done) {
                         if (buf.length > 0) processLine(JSON.parse(buf));
+                        resolve();
                     } else {
                         const chunk = decoder.decode(value, {
                             stream: true
@@ -59,35 +67,39 @@ function App() {
                         const parts = buf.split(matcher);
                         buf = parts.pop();
                         for (const i of parts.filter(p => p)) processLine(JSON.parse(i));
-                        return loop();
+                        return loop(resolve);
                     }
                 });
+            }
 
             return {
-                loop: loop(),
-                cancel: () => stream.close()
+                run: () => new Promise(loop),
+                cancel: () => stream.cancel()
             };
         }
     }
 
     function onFlux(prefix, body, method) {
+        setOutput("");
         setOutputState(OutputState.Reading);
         fetch(
             baseUrl + `${prefix}/${delay}`,
             {
                 method: method,
-                mode: "cors",
                 body: body,
                 headers: {
-                    Accept: "application/x-ndjson"
+                    'Content-Type': 'application/json',
+                    'Accept': "application/x-ndjson"
                 }
             }
         )
             .then(response => {
-                const parser = readStream(line => setOutput(prev => prev + JSON.stringify(line)));
-                const {loop, cancel} = parser(response);
-                setCancelCallback(cancel);
-                loop();
+                const parser = readStream(line => setOutput(prev =>
+                    [...prev, line]
+                ));
+                const {run, cancel} = parser(response);
+                setCancelCallback(() => cancel);
+                return run();
             })
             .then(() => {
                 setCancelCallback(null);
@@ -96,17 +108,20 @@ function App() {
     }
 
     function onSSE() {
+        setOutput("");
         setOutputState(OutputState.Reading);
         const sse = new EventSource(baseUrl + `/stream-sse/users/${delay}`);
-        sse.onerror = () => {
-            if (sse.readyState === EventSource.CLOSED)
-                onEndOfStream();
+        const callback = () => {
+            sse.close()
+            onEndOfStream();
         }
+        sse.onerror = callback;
         sse.onopen = () => {
-            setCancelCallback(() => sse.close());
-            sse.addEventListener("stream-sse-event", e => {
-                setOutput(prev => prev + e.data);
-            });
+            setCancelCallback(() => callback);
+            sse.addEventListener(
+                "stream-sse-event",
+                e => setOutput(prev => [...prev, JSON.parse(e.data)])
+            );
         }
     }
 
@@ -127,7 +142,7 @@ function App() {
     return (
         <div className="App">
             <div className="column">
-                <label htmlFor="in">Input JSON</label>
+                <label htmlFor="in">Input JSON Array</label>
                 <textarea id="in" value={input} onInput={onInput} style={{flex: 3}}/>
             </div>
             <div className="column input" style={{flex: 1}}>
@@ -138,14 +153,14 @@ function App() {
                         <label htmlFor='delay'>Delay</label>
                         <input id='delay' onChange={handleDelayChange} value={delay}/>
                         <button onClick={onFluxFromInput}>Flux Input</button>
-                        <button onClick={onFluxFromDB}>Flux Users</button>
-                        <button onClick={onSSE}>SSE Users</button>
+                        <button onClick={onFluxFromDB}>Flux DB</button>
+                        <button onClick={onSSE}>SSE DB</button>
                     </>
                 }
             </div>
             <div className="column">
-                <label htmlFor="out">Output JSON</label>
-                <textarea id="out" value={output} readOnly className={outputState} style={{flex: 3}}/>
+                <label htmlFor="out">Output JSON Array</label>
+                <textarea id="out" value={stringify()} readOnly className={outputState} style={{flex: 3}}/>
             </div>
         </div>
     );

@@ -8,7 +8,6 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/json")
@@ -17,7 +16,7 @@ class JSONController {
     private final AccountRepository repository;
 
     @PostMapping(value = "/stream-ndjson/{delay}", produces = MediaType.APPLICATION_NDJSON_VALUE)
-    Flux<Map<String, Object>> stream(@PathVariable("delay") long delayInMs, @RequestBody List<Map<String, Object>> ndjson) {
+    Flux<Object> stream(@PathVariable("delay") long delayInMs, @RequestBody List<Object> ndjson) {
         return Flux.fromIterable(ndjson)
                 .delayElements(Duration.ofMillis(delayInMs));
     }
