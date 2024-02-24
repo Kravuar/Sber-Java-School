@@ -78,6 +78,7 @@ public class Main {
 
     private static void JIT() {
         int size = 100_000;
+
         Map<Integer, Integer> map = new HashMap<>(size);
         for (int i = 0; i < size; ++i)
             map.put(i, i);
