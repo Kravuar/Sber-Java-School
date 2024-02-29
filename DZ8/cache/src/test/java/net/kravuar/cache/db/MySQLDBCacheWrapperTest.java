@@ -1,9 +1,8 @@
-package net.kravuar.cache;
+package net.kravuar.cache.db;
 
+import net.kravuar.cache.ConcurrentMapCache;
 import net.kravuar.cache.addapting.ValueWrapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,30 +10,41 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ANSIDBCacheTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class MySQLDBCacheWrapperTest {
     private static final String TABLE_NAME = "cache_table";
     private static final String KEY_COLUMN = "very_not_a_keyword";
     private static final String VALUE_COLUMN = "very_not_a_keyword_as_well";
-    private ANSIDBCache cache;
+    private PersistentCacheWrapper cache;
+    private PersistenceDelegate delegate;
     private Connection connection;
 
     @BeforeEach
     void setUp() throws SQLException {
         var innerCache = new ConcurrentMapCache(true);
-        connection = DriverManager.getConnection("jdbc:h2:mem:test");
-        cache = new ANSIDBCache(
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test ", "root", "testpassword");
+        delegate = new MySQLPersistenceDelegate(
                 connection,
-                innerCache,
                 TABLE_NAME,
                 KEY_COLUMN,
                 VALUE_COLUMN
+        );
+        cache = new PersistentCacheWrapper(
+                innerCache,
+                delegate
         );
     }
 
     @AfterEach
     void cleanUp() throws SQLException {
+        delegate.clear();
         if (connection != null)
             connection.close();
+    }
+
+    @AfterAll
+    void totalCleanUp() throws SQLException {
+        connection.createStatement().execute("DROP TABLE " + TABLE_NAME + ";");
     }
 
     @Test
@@ -45,12 +55,14 @@ class ANSIDBCacheTest {
 
         // when
         // emulate app restart
-        ANSIDBCache recreatedCache = new ANSIDBCache(
-                connection,
+        PersistentCacheWrapper recreatedCache = new PersistentCacheWrapper(
                 new ConcurrentMapCache(true),
-                TABLE_NAME,
-                KEY_COLUMN,
-                VALUE_COLUMN
+                new MySQLPersistenceDelegate(
+                        connection,
+                        TABLE_NAME,
+                        KEY_COLUMN,
+                        VALUE_COLUMN
+                )
         );
 
         // then
@@ -61,6 +73,38 @@ class ANSIDBCacheTest {
         assertNotNull(key2);
         assertEquals("value1", key1.value());
         assertEquals("value2", key2.value());
+    }
+
+    @Test
+    void putEntry_ThenReplaceAndRecreate_ReturnsReplaced() {
+        // given
+        Object key = "key";
+        Object originalValue = "value";
+        Object updatedValue = "updatedValue";
+        cache.put(key, originalValue);
+
+        // when
+        cache.put(key, updatedValue);
+        // emulate restart
+        PersistentCacheWrapper recreatedCache = new PersistentCacheWrapper(
+                new ConcurrentMapCache(true),
+                new MySQLPersistenceDelegate(
+                        connection,
+                        TABLE_NAME,
+                        KEY_COLUMN,
+                        VALUE_COLUMN
+                )
+        );
+
+        // then
+        ValueWrapper valueWrapper = recreatedCache.get(key);
+
+        assertNotNull(valueWrapper);
+        assertEquals(updatedValue, valueWrapper.value());
+
+        // then
+        ValueWrapper result = cache.get(key);
+        assertEquals(updatedValue, result.value());
     }
 
     @Test

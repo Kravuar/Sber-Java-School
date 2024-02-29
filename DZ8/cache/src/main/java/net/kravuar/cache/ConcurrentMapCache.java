@@ -13,7 +13,7 @@ public class ConcurrentMapCache extends AbstractNullAdaptingCache {
      *
      * @param allowNullValues whether to allow for {@code null} values.
      */
-    protected ConcurrentMapCache(boolean allowNullValues) {
+    public ConcurrentMapCache(boolean allowNullValues) {
         super(allowNullValues);
     }
 
