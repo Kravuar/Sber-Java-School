@@ -2,8 +2,8 @@ package net.kravuar;
 
 import lombok.RequiredArgsConstructor;
 import net.kravuar.exceptions.AccountNotFoundException;
-import net.kravuar.terminal.domain.card.CardDetails;
 import net.kravuar.exceptions.InvalidAccessTokenException;
+import net.kravuar.terminal.domain.card.CardDetails;
 
 import java.util.Map;
 

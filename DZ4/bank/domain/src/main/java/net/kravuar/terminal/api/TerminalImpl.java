@@ -2,12 +2,12 @@ package net.kravuar.terminal.api;
 
 import lombok.Getter;
 import net.kravuar.terminal.domain.card.CardDetails;
-import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.AuthenticationFailedException;
+import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.domain.exceptions.spi.InvalidCardDetailsException;
+import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidPinFormatException;
 import net.kravuar.terminal.domain.exceptions.terminal.InvalidSessionException;
-import net.kravuar.terminal.domain.exceptions.terminal.AccountIsLockedException;
 import net.kravuar.terminal.domain.exceptions.terminal.NoEstablishedSessionException;
 import net.kravuar.terminal.domain.lock.LockStorage;
 import net.kravuar.terminal.domain.session.Session;

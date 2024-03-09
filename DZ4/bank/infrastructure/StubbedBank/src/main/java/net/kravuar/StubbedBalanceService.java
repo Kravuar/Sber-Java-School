@@ -1,9 +1,9 @@
 package net.kravuar;
 
 import lombok.RequiredArgsConstructor;
-import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
-import net.kravuar.terminal.domain.exceptions.spi.AuthenticationFailedException;
 import net.kravuar.exceptions.InvalidAccessTokenException;
+import net.kravuar.terminal.domain.exceptions.spi.AuthenticationFailedException;
+import net.kravuar.terminal.domain.exceptions.spi.InsufficientFundsException;
 import net.kravuar.terminal.spi.BalanceService;
 
 @RequiredArgsConstructor
