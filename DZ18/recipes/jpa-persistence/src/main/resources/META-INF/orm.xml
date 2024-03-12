@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+                 http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
+                 version="2.2">
+
+    <description>Mapping for Recipe domain</description>
+
+    <entity class="net.kravuar.recipes.domain.Ingredient" access="FIELD">
+        <table name="ingredient"/>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="name">
+                <column nullable="false"/>
+            </basic>
+            <basic name="description">
+                <column nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.kravuar.recipes.domain.RecipeItem" access="FIELD">
+        <table name="recipe_item"/>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="count">
+                <column nullable="false"/>
+            </basic>
+            <basic name="countUnit">
+                <enumerated>STRING</enumerated>
+            </basic>
+            <many-to-one name="ingredient" fetch="EAGER" optional="false">
+                <join-column name="ingredientId" nullable="false"/>
+            </many-to-one>
+            <many-to-one name="recipe" optional="false">
+                <join-column name="recipeId" nullable="false"/>
+            </many-to-one>
+        </attributes>
+    </entity>
+
+    <entity class="net.kravuar.recipes.domain.Recipe" access="FIELD">
+        <table name="recipe"/>
+        <attributes>
+            <id name="id">
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="name">
+                <column nullable="false"/>
+            </basic>
+            <basic name="description">
+                <column nullable="false"/>
+            </basic>
+            <basic name="cookingTime">
+                <column nullable="false"/>
+            </basic>
+            <one-to-many name="recipeItems" fetch="LAZY" orphan-removal="true" mapped-by="recipe">
+                <!-- Not using cascade, since tests are written for non cascade persistence -->
+            </one-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>

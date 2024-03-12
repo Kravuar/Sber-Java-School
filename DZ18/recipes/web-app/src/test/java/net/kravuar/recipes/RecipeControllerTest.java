@@ -139,7 +139,7 @@ class RecipeControllerTest {
     void givenExistingRecipe_whenFindRecipesByName_thenReturnMatchingRecipes() throws Exception {
         // Given
         Recipe recipe = testRecipe();
-        recipe =  recipeRepository.save(recipe);
+        recipe = recipeRepository.save(recipe);
         recipeItemRepository.save(testRecipeItem(recipe));
 
         // When & Then
@@ -153,7 +153,7 @@ class RecipeControllerTest {
     void givenExistingRecipes_whenFindRecipesByCookingTime_thenReturnMatchingRecipes() throws Exception {
         // Given
         Recipe recipe = testRecipe();
-        recipe =  recipeRepository.save(recipe);
+        recipe = recipeRepository.save(recipe);
         recipeItemRepository.save(testRecipeItem(recipe));
 
         // When & Then
