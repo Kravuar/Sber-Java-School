@@ -43,6 +43,7 @@ class RecipeController {
     List<RecipeDTO> findRecipesByCookingTimeLessThan(@PathVariable("upperBound") Duration upperBound) {
         return recipeService.findByCookingTimeLessThan(upperBound).stream()
                 .map(recipeMapper::toDto)
+                .peek(System.out::println)
                 .toList();
     }
 }

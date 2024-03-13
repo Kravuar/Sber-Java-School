@@ -1,7 +1,5 @@
 package net.kravuar.recipes;
 
-import net.kravuar.recipes.domain.RecipeItem;
-
 import java.time.Duration;
 import java.util.List;
 
@@ -11,6 +9,6 @@ record RecipeDTO(
         String name,
         Duration cookingTime,
         String description,
-        List<RecipeItem> recipeItems
+        List<RecipeItemDTO> recipeItems
 ) {
 }
