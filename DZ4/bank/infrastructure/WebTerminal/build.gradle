@@ -1,0 +1,27 @@
+apply plugin: 'application'
+
+application {
+    mainClass = 'net.kravuar.Main'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'net.kravuar.Main'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.3'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    implementation project(":DZ4:bank:infrastructure:StubbedBank")
+//    TODO: Why do i have to do that explicitly
+    implementation project(":DZ4:bank:domain")
+}

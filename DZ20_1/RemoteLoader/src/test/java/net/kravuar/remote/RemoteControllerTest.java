@@ -1,4 +1,4 @@
-package net.kravuar.rest;
+package net.kravuar.remote;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,11 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static net.kravuar.rest.RemoteController.CACHED_AT_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -22,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RemoteControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private RemoteProps remoteProps;
 
     @Test
     void givenValidUrl_WhenGetRemote_ThenReturnsOk() throws Exception {
@@ -30,6 +32,7 @@ class RemoteControllerTest {
 
         // When & Then
         mockMvc.perform(get("/remote/get/{url}", validUrl))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
     }
 
@@ -39,9 +42,10 @@ class RemoteControllerTest {
         String invalidUrl = URLEncoder.encode("invalid-url", StandardCharsets.UTF_8);
 
         // When
-        MockHttpServletResponse response = mockMvc.perform(
-                        get("/remote/get/{url}", invalidUrl)
-                ).andReturn()
+        MockHttpServletResponse response = mockMvc
+                .perform(get("/remote/get/{url}", invalidUrl))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn()
                 .getResponse();
 
         // Then
@@ -55,7 +59,8 @@ class RemoteControllerTest {
 
         // When & Then
         mockMvc.perform(get("/remote/get/{url}", validUrl))
-                .andExpect(header().exists(CACHED_AT_HEADER));
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(header().exists(remoteProps.cacheHeaderName()));
     }
 
     @Test
@@ -65,6 +70,7 @@ class RemoteControllerTest {
 
         // When & Then
         mockMvc.perform(get("/remote/get/{url}", invalidUrl))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isInternalServerError());
     }
 }

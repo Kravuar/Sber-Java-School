@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
  */
 @RequiredArgsConstructor
 public class StubbedPinValidator implements PinValidator {
-    private static final char SPECIAL_DIGIT = '0';
+    public static final char SPECIAL_DIGIT = '0';
     private final AccountService accountService;
 
     @Override
