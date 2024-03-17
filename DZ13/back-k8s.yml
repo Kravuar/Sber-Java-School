@@ -90,4 +90,3 @@ spec:
     app: back
   ports:
     - port: 8080
-  type: LoadBalancer
