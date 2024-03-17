@@ -12,4 +12,6 @@ COPY --from=builder modules-dependencies ./
 COPY --from=builder snapshot-dependencies/ ./
 COPY --from=builder application/ ./
 
+EXPOSE 8080
+
 CMD ["java", "org.springframework.boot.loader.launch.JarLauncher"]

@@ -1,14 +1,15 @@
 spring:
-  r2dbc:
-    url: r2dbc:h2:mem:///~/db/user
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 
 logging:
   level:

@@ -143,7 +143,7 @@ function App() {
         <div className="App">
             <div className="column">
                 <label htmlFor="in">Input JSON Array</label>
-                <textarea id="in" value={input} onInput={onInput} style={{flex: 3}}/>
+                <textarea id="in" className="in" value={input} onInput={onInput} style={{flex: 3}}/>
             </div>
             <div className="column input" style={{flex: 1}}>
                 {outputState === OutputState.Reading ?

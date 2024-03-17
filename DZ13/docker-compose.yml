@@ -1,13 +1,37 @@
 version: '4.27'
 services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: json-app-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      back-db-network:
+
   back:
-    build: ./back
+    image: kravuar/dz21back:latest
+    environment:
+      SPRING_R2DBC_URL: 'r2dbc:mysql://db:3306/json-app-db'
+      SPRING_R2DBC_USERNAME: 'root'
+      SPRING_R2DBC_PASSWORD: 'pass'
     ports:
       - "8080:8080"
+    networks:
+      back-db-network:
 
   front:
-    build: ./front
+    image: kravuar/dz21front:latest
     environment:
       REACT_APP_BACKEND_URL: "http://localhost:8080/json"
     ports:
       - "3000:3000"
+
+volumes:
+  db-data:
+
+networks:
+  back-db-network:
