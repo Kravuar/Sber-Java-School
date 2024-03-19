@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: front
+  name: front-new
 spec:
   selector:
     matchLabels:
@@ -11,11 +11,11 @@ spec:
     metadata:
       labels:
         app: front
-        version: v1
+        version: v2
     spec:
       containers:
         - name: front
-          image: kravuar/dz21front:latest
+          image: kravuar/dz21front-new:latest
           env:
             - name: REACT_APP_BACKEND_URL
               value: / # TODO: placeholder, insert ngrok
