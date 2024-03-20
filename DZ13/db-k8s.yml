@@ -23,6 +23,7 @@ spec:
     metadata:
       labels:
         app: mysql
+        version: v1
     spec:
       containers:
         - name: mysql

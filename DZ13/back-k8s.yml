@@ -11,6 +11,7 @@ spec:
     metadata:
       labels:
         app: back
+        version: v1
     spec:
       containers:
         - name: back
@@ -35,24 +36,3 @@ spec:
     app: back
   ports:
     - port: 8080
-
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: back
-  namespace: app
-spec:
-  hosts:
-    - "*" # It is possible to put the ngrok host instead of wildcard here, but requires more manual steps
-  gateways:
-    - gateway-api
-  http:
-    - match:
-        - uri:
-            prefix: "/"
-      route:
-        - destination:
-            host: back
-            port:
-              number: 8080
