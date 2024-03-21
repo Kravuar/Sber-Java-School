@@ -1,21 +1,48 @@
+# Мдееееееееееееееееееееееееееееееее
+
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: gateway-api
-  namespace: istio-system
+  namespace: app
 spec:
   selector:
     istio: ingressgateway
   servers:
     - port:
-        number: 8080
-        name: back
+        number: 443
+        name: http
         protocol: HTTP
       hosts:
         - "*"
-    - port:
-        number: 3000
-        name: front
-        protocol: HTTP
-      hosts:
-        - "*"
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: gateway-service
+  namespace: app
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - gateway-api
+  http:
+    - match:
+        - uri:
+            prefix: /back
+      route:
+        - destination:
+            host: back
+            port:
+              number: 8080
+      rewrite:
+        uri: /
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: front
+            port:
+              number: 3000

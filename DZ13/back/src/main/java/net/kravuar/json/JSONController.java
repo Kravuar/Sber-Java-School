@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/json")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 class JSONController {
     private final AccountRepository repository;
 

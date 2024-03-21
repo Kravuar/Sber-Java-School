@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,9 +17,11 @@ spec:
           image: kravuar/dz21front:latest
           env:
             - name: REACT_APP_BACKEND_URL
-              value: / # TODO: placeholder, insert ngrok
+              value: http://localhost:8080/json
           ports:
             - containerPort: 3000
+              hostPort: 3000
+              protocol: TCP
 
 ---
 apiVersion: v1
@@ -32,4 +33,6 @@ spec:
     app: front
   ports:
     - port: 3000
-  type: ClusterIP
+      targetPort: 3000
+      protocol: TCP
+  type: LoadBalancer

@@ -4,15 +4,15 @@ metadata:
   name: front
 spec:
   hosts:
-    - "*"
+    - front
   http:
     - route:
         - destination:
-            host: "*"
+            host: front
             subset: v1
           weight: 50
         - destination:
-            host: "*"
+            host: front
             subset: v2
           weight: 50
 
@@ -22,7 +22,7 @@ kind: DestinationRule
 metadata:
   name: front
 spec:
-  host: "*"
+  host: front
   subsets:
     - name: v1
       labels:
