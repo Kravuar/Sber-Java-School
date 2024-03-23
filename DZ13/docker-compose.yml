@@ -5,8 +5,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: pass
       MYSQL_DATABASE: json-app-db
-    ports:
-      - "3306:3306"
+    expose:
+      - "3306"
     volumes:
       - db-data:/var/lib/mysql
     networks:
