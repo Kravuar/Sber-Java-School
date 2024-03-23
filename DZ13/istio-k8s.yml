@@ -10,7 +10,7 @@ spec:
     istio: ingressgateway
   servers:
     - port:
-        number: 443
+        number: 80
         name: http
         protocol: HTTP
       hosts:
@@ -30,17 +30,17 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /back
+            prefix: "/back/" # extra '/' here as a workaround, without it results in '//' prefix after rewrite
       route:
         - destination:
             host: back
             port:
               number: 8080
       rewrite:
-        uri: /
+        uri: "/"
     - match:
         - uri:
-            prefix: /
+            prefix: "/"
       route:
         - destination:
             host: front

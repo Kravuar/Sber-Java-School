@@ -17,7 +17,7 @@ spec:
           image: kravuar/dz21front:latest
           env:
             - name: REACT_APP_BACKEND_URL
-              value: http://localhost:8080/json
+              value: https://ad68-95-25-60-157.ngrok-free.app/back/json
           ports:
             - containerPort: 3000
               hostPort: 3000
@@ -35,4 +35,4 @@ spec:
     - port: 3000
       targetPort: 3000
       protocol: TCP
-  type: LoadBalancer
+  type: ClusterIP
